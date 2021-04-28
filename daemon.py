@@ -6,9 +6,7 @@ import kafka
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 from kafka import KafkaProducer
-
-producer = ""
-parkkey = 1
+from metrics import parking_data
 
 # jobs
 def hour_job():
@@ -27,14 +25,9 @@ def thirty_sec_job():
     print("this job runs every 30 sec")
 
 def twenty_min_job(producer, parkkey):
-    r = requests.get("http://services.web.ua.pt/parques/parques")
-    parking = r.json()
-    timestamp = parking.pop(0)
-    parking = [{"Nome":park["Nome"], "Capacidade" : park["Capacidade"], "Ocupado" : park["Ocupado"], "Livre" : park["Livre"]} for park in parking]
-    parking.insert(0, timestamp)
-    producer.send("parking", value={"PARK"+str(parkkey) : parking})
+    parking = parking_data()
     parkkey = parkkey + 1
-    print("sended" + str({"PARK"+str(parkkey) : parking}))
+    producer.send("parking", value={"PARK"+str(parkkey) : parking})
 
 
 def main():
