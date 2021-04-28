@@ -1,0 +1,51 @@
+
+
+DEP = {
+    "deti" : "deti-ap",
+    "biblioteca" : "biblioteca-ap",
+    "aauav" : "aauav-ap",
+    "deca" : "deca-ap",
+    "dbio" : "dbio-ap",
+    "dmat" : "dmat-ap",
+    "decivil" : "decivil-ap",
+    "fis" : "fis-ap",
+    "dem" : "dem-ap",
+    "geo" : "geo-ap",
+    "cpct" : "cpct-ap",
+    "dcspt" : "dcspt-ap",
+    "essua" : "essua-ap",
+    "cicfano" : "cicfano-ap",
+    "degeit" : "degeit-ap",
+    "dq" : "dq-ap",
+    "dao" : "dao-ap",
+    "it" : "it-ap",
+    "dep" : "dep-ap",
+    "dlc" : "dlc-ap",
+    "isca" : "isca-ap",
+    "ietta" : "ietta-ap"
+}
+
+MAX_AP = {
+    'deti': 23, 
+    'biblio': 26,
+    'aauav': 7,
+    'dbio': 26,
+    'deca': 19,
+    'dmat': 26,
+    'decivil': 8,
+    'fis': 16,
+    'dem': 20,
+    'geo': 19,
+    'cpct': 22,
+    'dcspt': 14,
+    'essua': 30,
+    'cicfano': 11,
+    'degeit': 21,
+    'dq': 24,
+    'it': 21,
+    'dao': 17, 
+    'dep': 19,
+    'dlc': 15,
+    'isca': 16,
+    'ietta': 0
+}
