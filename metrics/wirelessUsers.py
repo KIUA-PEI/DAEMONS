@@ -1,18 +1,35 @@
 import requests
-from consts import *
+import json
+from .consts import *
+from .util import *
 
 def data_wirelessUsers(token):
-    print("teste")
-    for dep in DEP:
-        i = 0
-        print("teste" + str(i))
-        while i < MAX_AP[dep]:
-            print("https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint/"+str(DEP[dep])+(str(i) if i >= 10 or i != 0 else "0" + str(i))+"/TotalUsernames")
-            r = requests.get("https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint/"+\
-            str(DEP[dep])+(str(i) if i >= 10 and i != 0 else "0" + str(i))+"/TotalUsernames", headers={'Authorization': token})
-            print(r.status_code)
-            print(r.text)
-            i = i + 1
+    number_users = WIFIUSERS
+    for i in range(8):
+        r = requests.get('https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='+str(i*100), headers={'Authorization': token})
+        
+        if r.status_code == 401:
+            number_users = WIFIUSERS
+            token = get_acess_token()
+            data_wirelessUsers(token)
+            break
+        
+        elif r.status_code == 200:
+            data = json.loads(r.text)
+            for ap in data["accessPoints"]:
+                for dep in DEP:
+                    try:
+                        if ap["name"].split("-ap")[0] == dep:
+                            number_users[dep] = number_users[dep] + ap["clientCount"]
+                    except Exception:
+                        print("error")
 
+    return [{"Timestamp" : get_timestamp()}, number_users]
 
-data_wirelessUsers('Bearer ' + "3e5de3f5-099a-3461-9bfa-4d0aa94ac264")
+# print(number_users) 29 abril, 18:36
+# {
+#     'deti': 201, 'biblioteca': 288, 'aauav': 10, 'dbio': 126, 'deca': 105, 
+#     'dmat': 107, 'decivil': 52, 'fis': 132, 'dem': 95, 'geo': 29, 'cpct': 210, 
+#     'dcspt': 45, 'essua': 175, 'cicfano': 63, 'degeit': 116, 'dq': 87, 
+#     'it': 54, 'dao': 38, 'dep': 54, 'dlc': 69, 'isca': 75, 'ietta': 0
+# }

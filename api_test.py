@@ -29,14 +29,16 @@ def explore_access_points():
     }
 
     for i in range(8):
+        print("https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult="+str(i*100))
         r = requests.get('https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='+str(i*100), headers={'Authorization': token})
         acess_points = json.loads(r.text)
         for ap in acess_points["accessPoints"]:
-            # print(ap["name"])
+            print(ap["name"])
             try:
                 if ap["name"].find("deti") != -1:
                     ap_num = int(ap["name"][-2:])
                     highest_aps["deti"] = ap_num if ap_num > highest_aps["deti"] else highest_aps["deti"]
+                    print(ap)
 
                 if ap["name"].find("biblioteca") != -1:
                     ap_num = int(ap["name"][-2:])
@@ -160,5 +162,7 @@ def explore_access_points():
 def main():
     explore_access_points()
     
+
+
 
 main()

@@ -49,3 +49,28 @@ MAX_AP = {
     'isca': 16,
     'ietta': 0
 }
+
+WIFIUSERS = {
+    'deti': 23, 
+    'biblioteca': 26,
+    'aauav': 7,
+    'dbio': 26,
+    'deca': 19,
+    'dmat': 26,
+    'decivil': 8,
+    'fis': 16,
+    'dem': 20,
+    'geo': 19,
+    'cpct': 22,
+    'dcspt': 14,
+    'essua': 30,
+    'cicfano': 11,
+    'degeit': 21,
+    'dq': 24,
+    'it': 21,
+    'dao': 17, 
+    'dep': 19,
+    'dlc': 15,
+    'isca': 16,
+    'ietta': 0
+}
