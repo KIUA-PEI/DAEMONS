@@ -27,7 +27,7 @@ DEP = {
 
 MAX_AP = {
     'deti': 23, 
-    'biblio': 26,
+    'biblioteca': 26,
     'aauav': 7,
     'dbio': 26,
     'deca': 19,
