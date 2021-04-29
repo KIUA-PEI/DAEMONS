@@ -1,5 +1,4 @@
 import requests
-import calendar
 import pytz
 from pytz import timezone, common_timezones
 from datetime import datetime
