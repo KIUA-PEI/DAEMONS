@@ -33,17 +33,6 @@ def ten_sec_job(producer):
 def thirty_sec_job():
     print("this job runs every 30 sec")
 
-<<<<<<< HEAD:scheduler.py
-def twenty_min_job(url,producer, parkkey):
-    r = requests.get(url)
-    parking = r.json()
-    timestamp = parking.pop(0)
-    parking = [{"Nome":park["Nome"], "Capacidade" : park["Capacidade"], "Ocupado" : park["Ocupado"], "Livre" : park["Livre"]} for park in parking]
-    parking.insert(0, timestamp)
-    producer.send("parking", value={"PARK"+str(parkkey) : parking})
-    parkkey = parkkey + 1
-    print("sended" + str({"PARK"+str(parkkey) : parking}))
-=======
 def twenty_min_job(producer, token, keys):
     # parking data
     parking = parking_data()
@@ -57,7 +46,6 @@ def twenty_min_job(producer, token, keys):
     producer.send("wifiusr", value={"WIFIUSR"+str(keys["wirelessUsers"]) : wireless_users})
 
 
->>>>>>> 4db75167c9b2394ed2c2d607c112022ea3647106:daemon.py
 
 
 def launch_daemon(url,key=None):
@@ -83,11 +71,7 @@ def launch_daemon(url,key=None):
     scheduler.add_job(hour_job, trigger="interval", hours=1, id="1hourjob")
     scheduler.add_job(ten_sec_job, trigger="interval", args=[producer], seconds=10, id="10secjob")
     scheduler.add_job(thirty_sec_job, trigger="interval", seconds=30, id="30secjob")
-<<<<<<< HEAD:scheduler.py
-    scheduler.add_job(twenty_min_job, trigger="interval", args=[url,producer, parkkey], minutes=20, id="20minjob", next_run_time=datetime.now())
-=======
     scheduler.add_job(twenty_min_job, trigger="interval", args=[producer, token, KAFKAKEYS], minutes=20, id="20minjob", next_run_time=datetime.now())
->>>>>>> 4db75167c9b2394ed2c2d607c112022ea3647106:daemon.py
 
     # start the scheduler
     scheduler.start()
