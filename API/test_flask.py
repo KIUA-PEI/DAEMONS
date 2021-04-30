@@ -11,7 +11,7 @@ print()
 
 # tentar ver um daemon que existe
 print("_________________ ID REQUEST __________________")
-r = requests.get('http://127.0.0.1:5000/Daemon/2')
+r = requests.get('http://127.0.0.1:5000/Daemon/3')
 print(r.status_code)
 print()
 
@@ -25,7 +25,7 @@ print()
 
 # alterar o url de um daemon
 print("_________________ UPDATE URL REQUEST __________________")
-r = requests.get('http://127.0.0.1:5000/Daemon/update_url/1',{"url":"www.updated.pt"})
+r = requests.get('http://127.0.0.1:5000/Daemon/update_url/1',{"url":"www.updated.pt"},headers={'Authorization':'ads786zxc!SAD$sadz#xc'})
 print(r.status_code)
 if r.status_code < 400:
     print(r.json())
