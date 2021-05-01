@@ -1,3 +1,12 @@
+#   tentar automatizar o daemon
+#   ter um url como arg
+#   dar como argumento o token com opção de null
+#   dar launch a esse daemon e 
+#   enviar a informação para a database e katka
+#   permitir ter uma lista de (url,key)'s para dar launch
+
+
+import requests
 import time
 import json
 import kafka
@@ -42,7 +51,7 @@ def twenty_min_job(producer, client, token, keys):
 
 
 
-def main():
+def launch_daemon(url,key=None):
     print("runs main")
     # start scheduler
     scheduler = BackgroundScheduler()
@@ -103,3 +112,5 @@ if __name__=="__main__":
 #         }
 #     }
 # ]
+
+# launch_daemon("http://services.web.ua.pt/parques/parques")
