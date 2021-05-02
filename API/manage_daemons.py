@@ -1,0 +1,1 @@
+# utils para mexer com o ficheiro dos daemons .bin

@@ -5,6 +5,7 @@
 #   com os seus daemons
 #   podemos ter a api a gerar random keys e a enviar para a api do backoffice cada dia
 #   para mudar a key
+#   só permitir ip da maquina do backoffice
 
 from flask import Flask, request, jsonify, make_response
 from flask_restful import Api,Resource,reqparse,abort
@@ -13,12 +14,13 @@ import jwt
 import datetime
 from functools import wraps
 
+
 app = Flask(__name__)
 api = Api(app)
 
 
 #   AUTHENTICATION TOKEN
-app.config['SECRET_KEY'] = 'ads786zxc!SAD$sadz#xc'
+app.config['SECRET_KEY'] = 'ASDzxcdwekjkads786zxc!SAda$sadz#xc7(Sdsdz87987231q3'
 
 @app.route('/login', methods=['GET'])
 def login():
@@ -153,12 +155,15 @@ def api_update_metric(daemon_id):
     return daemons[daemon_id],200
 
 # adicionar um daemon
+# testar dar launch ao daemon a partir desta função com os args -> url,key,args,request=1/0
+# depois testar escrever no ficheiro com os args de cada daemon e ver se o daemon vai ler bem
 @app.route('/Daemon/Add', methods=['GET'])
 @token_required
 def api_add_daemon():
     pass
 
 # pausar um daemon
+# tentar alterar o ficheiro dos daemons request = 0
 @app.route('/Daemon/Pause/<int:daemon_id>', methods=['GET'])
 @token_required
 def api_pause_daemon():

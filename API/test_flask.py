@@ -25,7 +25,7 @@ print()
 
 # alterar o url de um daemon
 print("_________________ UPDATE URL REQUEST __________________")
-r = requests.get('http://127.0.0.1:5000/Daemon/update_url/1',{"url":"www.updated.pt"},headers={'Authorization':'ads786zxc!SAD$sadz#xc'})
+r = requests.get('http://127.0.0.1:5000/Daemon/update_url/1',{"url":"www.updated.pt"},headers={'Authorization':'ASDzxcdwekjkads786zxc!SAda$sadz#xc7(Sdsdz87987231q3'})
 print(r.status_code)
 if r.status_code < 400:
     print(r.json())

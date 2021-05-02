@@ -1,0 +1,22 @@
+{
+    "open_request":[
+        {
+            "url": "http://services.web.ua.pt/parques/parques",
+            "args":["Nome","Capacidade","Ocupado","Livre"]
+        }
+    ],
+    "token_request":[
+        {
+            "url":"https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/Building",
+            "args": ["accessPoints"],
+            "key":"al9tR25keEsyV0xLRVVLYkdya1g3bjF1e",
+            "secret":"EFFYTpCcnN6SDhvRjlRc0hSamlPQUMxRDlaZTBJbG9h",
+            "content_type":"application/x-www-form-urlencoded",
+            "auth_type": "Basic",
+            "token_type": "Bearer"
+        }
+    ],
+    "key_request":[
+        
+    ]
+}
