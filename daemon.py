@@ -4,8 +4,6 @@
 #   dar launch a esse daemon e 
 #   enviar a informação para a database e katka
 #   permitir ter uma lista de (url,key)'s para dar launch
-
-
 import requests
 import time
 import json
@@ -32,26 +30,43 @@ def ten_sec_job(producer):
 def thirty_sec_job():
     print("this job runs every 30 sec")
 
-def twenty_min_job(producer, client, token, keys):
+def twenty_min_job(producer, influx, token, keys):
     # parking data
     parking = parking_data()
     keys["parking"] = keys["parking"] + 1
-    producer.send("parking", value={"PARK"+str(keys["parking"]) : parking})
+    try:
+        producer.send("parking", value={"PARK"+str(keys["parking"]) : parking})
 
-    # parking data influx formated
-    parking = parking_format_influx(parking)
+        # parking data influx formated
+        parking = parking_format_influx(parking)
 
-
-    # number of wireless users data
-    wireless_users = wirelessUsers_data(token)
-    print(wireless_users)
-    keys["wirelessUsers"] = keys["wirelessUsers"] + 1
-    producer.send("wifiusr", value={"WIFIUSR"+str(keys["wirelessUsers"]) : wireless_users})
-
+        jsonb = []
+        for park in parking:
+            # print(park[0])
+            jsonb.append(park[0])
 
 
+        # print(parking)
 
-def launch_daemon(url,key=None):
+        influx.write_points(jsonb, database="Metrics")
+        
+
+
+        # number of wireless users data
+        wireless_users = wirelessUsers_data(token)
+        print(wireless_users)
+        keys["wirelessUsers"] = keys["wirelessUsers"] + 1
+        producer.send("wifiusr", value={"WIFIUSR"+str(keys["wirelessUsers"]) : wireless_users})
+
+        print(wireless_users)
+
+        influx.write_points(wireless_users, database="Metrics")
+    except:
+        print("deu coco")
+
+
+# def launch_daemon(url,key=None):
+def main():
     print("runs main")
     # start scheduler
     scheduler = BackgroundScheduler()
@@ -64,23 +79,27 @@ def launch_daemon(url,key=None):
     scheduler.configure(job_defaults=job_defaults)
 
     # start Kafka Python Client
-    producer = KafkaProducer(bootstrap_servers=['13.69.49.187:9092'], value_serializer=lambda x: json.dumps(x, indent=4, sort_keys=True, default=str).encode('utf-8'))
+    try:
+        producer = KafkaProducer(bootstrap_servers=['13.69.49.187:9092'], value_serializer=lambda x: json.dumps(x, indent=4, sort_keys=True, default=str).encode('utf-8'))
 
     # start influxDBClient
-    influx = InfluxDBClient(host='127.0.0.1', port=8086)
+        influx = InfluxDBClient(host='40.113.101.222', port=8086, username="daemon", password="daemon_1234")
 
-    # create influx user and database
-    influx.create_user("daemon", "daemon_1234", admin=True)
-    influx.create_database("Metrics")
+        # create influx user and database
+        # influx.create_user("daemon", "daemon_1234", admin=True)
+        # influx.create_database("Metrics")
 
-    # get primecoreAPI access token
-    token = get_acess_token()
+        # get primecoreAPI access token
+        token = get_acess_token()
 
-    # add jobs
-    scheduler.add_job(hour_job, trigger="interval", hours=1, id="1hourjob")
-    scheduler.add_job(ten_sec_job, trigger="interval", args=[producer], seconds=10, id="10secjob")
-    scheduler.add_job(thirty_sec_job, trigger="interval", seconds=30, id="30secjob")
-    scheduler.add_job(twenty_min_job, trigger="interval", args=[producer, client, token, KAFKAKEYS], minutes=20, id="20minjob", next_run_time=datetime.now())
+        # add jobs
+        scheduler.add_job(hour_job, trigger="interval", hours=1, id="1hourjob")
+        scheduler.add_job(ten_sec_job, trigger="interval", args=[producer], seconds=10, id="10secjob")
+        scheduler.add_job(thirty_sec_job, trigger="interval", seconds=30, id="30secjob")
+        scheduler.add_job(twenty_min_job, trigger="interval", args=[producer, influx, token, KAFKAKEYS], minutes=20, id="20minjob", next_run_time=datetime.now())
+
+    except:
+        print("deu coco2")
 
     # start the scheduler
     scheduler.start()
