@@ -10,6 +10,7 @@ import json
 import kafka
 import requests
 
+from Api import *
 from consts import *
 from datetime import datetime
 from kafka import KafkaProducer
