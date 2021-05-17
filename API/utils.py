@@ -67,46 +67,50 @@ def create_entry(measurement, tags, timestamp, fields):
     """
     return [{"measurement": measurement, "tags" : tags, "time" : timestamp, "fields": fields}]
 
-# args -> ficheiro json da db do url 
-# vals -> ficheiro json que recebeu da API
-def filter_request(vals,args):
-    result = {}
-    # converter args em dict
-    # converter vals em dict
-    
-    for field in args:
-        # USAR TRY CATCH !!! se der erro mudar o status do url para invalido ou os args = None
-        #print(field)
-        #print(args[field])
-        if isinstance(args[field],list) or isinstance(args[field],set):
-            # vai buscar todos os valores da lista arg
-            result[field] = []
-            for val in args[field]:
-                #print('\n')
-                #print(field)
-                #print(result)
-                #print(val)
-                #print(vals[field])
-                #print('\n')
-                if isinstance(vals[field],list):
-                    #print('ASDASDASDASD')
-                    #print(result)
-                    #print('\n')
-                    for v in vals[field]:
-                        result[field].append(v[val])
-                    continue 
-                if isinstance(vals[field],dict):
-                    result[field].append(v[val])
-            continue       
-        result[field] = vals[field]
-    return result
 
+def filter_request(vals,args):
+    aux = list(vals.keys())    
+    for field in [field for field in aux if field not in args]:
+        if isinstance(vals[field],list) or isinstance(vals[field],set):
+            i=0
+            for v in vals[field]:
+                vals[field][i] = filter_request(v,args)  
+                i+=1
+            continue
+        if isinstance(vals[field],dict):
+            for key in vals[field].keys():
+                if not key in args:
+                    del vals[key]
+            continue
+        if not field in args:
+            del vals[field]
+    return vals
+
+def filter_request_add(vals,args):
+    result = {}
+    
+    for field in vals.keys():
+        if isinstance(vals[field],list) or isinstance(vals[field],set):
+            for v in vals[field]:
+                aux = filter_request(v,args)
+                for key in aux:
+                    if key in result:
+                        result[key] += aux[key]
+                    else:
+                        result[key] = aux[key]   
+            continue
+        if field in args:
+            print(vals[field])
+            result[field] = vals[field]
+    return result
 
 # test filter_request
 
 #args = {"accessPoints"}
 # depois testar 
-args = {"accessPoints": ["name","macAddress","location"]}
+#args = {"accessPoints": ["clientCount","macAddress","location"]}
+args = ["first","count","clientCount","macAddress","location"]
+
 url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='
 token_url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
 secret = 'BrszH8oF9QsHRjiOAC1D9Ze0Iloa'
@@ -115,24 +119,16 @@ content_type = 'application/x-www-form-urlencoded'
 key = 'j_mGndxK2WLKEUKbGrkX7n1uxAEa'
 # get_token(url,key,secret,content_type=None,auth_type=None)
 token = get_token(token_url,key,secret,content_type,auth_type)
-for i in range(2):
+for i in range(8):
     r = make_request_token(url+str(i*100),token)
-    print(r)
-    v = filter_request(r,args)
-    #print(v)
+    print(r['accessPoints'][0]['macAddress'])
+    data = filter_request(r,args)
+    
+        
+    print(data)
     print('\n')
+    print(data['accessPoints'][0])
     print('\n')
+    print(data["accessPoints"])
     print('\n')
-    print('\n')
-
-# CRIAR UMA MANEIRA DE PROCURAR UMA CERTA KEY EM todo o DICT
-# tipo args = first,count,last,macAddress
-# vai buscar todos os valores do dicionario em que a key é uma dessas ...
-# e fica +- result = {"first":v1,"last":v2,}
-# TENTAR VER SE O SWAGGER NO PYTHON SERVE PARA IR BUSCAR CERTOS VALORES 
-
-# ...
-# if not isinstance(list) adicionar ao result
-# if isinstance(list) ver key a key
-# [accessPoints,macAddress,...]
-# vals[accessPoints][macAddress][...]
+    

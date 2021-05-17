@@ -1,3 +1,6 @@
+# ADICIONAR FREQ ... [5,30,60,...]
+
+
 # adicionar metodos para alterar os valores de cada daemon
 # keys,campos, ... 
 # 
