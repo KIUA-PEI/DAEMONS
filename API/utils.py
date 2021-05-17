@@ -67,7 +67,7 @@ def create_entry(measurement, tags, timestamp, fields):
     """
     return [{"measurement": measurement, "tags" : tags, "time" : timestamp, "fields": fields}]
 
-
+# só pode receber certos tipos de dados ...
 def filter_request(vals,args):
     aux = list(vals.keys())    
     for field in [field for field in aux if field not in args]:
@@ -109,7 +109,7 @@ def filter_request_add(vals,args):
 #args = {"accessPoints"}
 # depois testar 
 #args = {"accessPoints": ["clientCount","macAddress","location"]}
-args = ["first","count","clientCount","macAddress","location"]
+""" args = ["first","count","clientCount","macAddress","location"]
 
 url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='
 token_url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
@@ -130,5 +130,5 @@ for i in range(8):
     print(data['accessPoints'][0])
     print('\n')
     print(data["accessPoints"])
-    print('\n')
+    print('\n') """
     

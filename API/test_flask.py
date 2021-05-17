@@ -2,8 +2,16 @@ import requests
 import json
 
 # tentar adicionar um daemon novo
+print("_________________ PRINT BASIC DAEMON REQUEST __________________")
+r = requests.get('http://127.0.0.1:5000/Daemon/Print/Basic',headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()  
+
 print("_________________ ADD BASIC DAEMON REQUEST __________________")
-r = requests.get('http://127.0.0.1:5000/Daemon/Add/Basic',{"url":"www.dated1.pt"},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Basic',{"url":"www.dated1.pt","period":15},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
 print(r.status_code)
 print(r.text)
 if r.status_code < 400:
@@ -72,6 +80,14 @@ r = requests.get('http://127.0.0.1:5000/Daemon/Print/Basic',headers={'Authorizat
 print(r.status_code)
 print(r.text)
 
+if r.status_code < 400:
+    print(r)
+print()   
+
+print("_________________ GET BASIC DAEMON FREQ5 REQUEST __________________")
+r = requests.get('http://127.0.0.1:5000/Daemon/Basic/Period/5',headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
 if r.status_code < 400:
     print(r)
 print()   

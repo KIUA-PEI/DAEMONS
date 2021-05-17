@@ -17,170 +17,130 @@ import jwt
 import datetime
 from functools import wraps
 
-# args format -> arg1,arg2,arg3|arg4|arg5 -> arg3 é um dict e obter os arg4 e arg5
-
-def convert_args(args):
-    pass
-def read_args(args):
-    pass
-
 
 app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATEBASE_URI'] = 'sqlite:///site.db'
+#C:\Users\alexg\OneDrive\Desktop\PEI\DAEMONS
+#app.config['SQLALCHEMY_DATEBASE_URI'] = 'sqlite:///C:\\Users\\alexg\\Onedrive\\Desktop\\PEI\\DAEMONS\\API\\daemon.db'
+app.config['SQLALCHEMY_ECHO'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
-# __________________________ DB QUERYS _____________________________
-
-# return basic url's
-def get_basics():
-    print('\n')
-    print('\n')
-    print('\n')
-    print(Basic_url.query.all())
-    print('\n')
-    print('\n')
-    print('\n')
-    return Basic_url.query.all()
-def check_basics_url(url):
-    return Basic_url.query.filter(Basic_url.url == url).first()
-def get_basic_status(val):
-    return Key_url.query.filter_by(Basic_url.status==val)
-def pause_basic(url):
-    #Basic_url.update().where(Basic_url.url == url).values(status=False)
-    Basic_url.query.filter(Basic_url.url == url).update({"status": False})
-    db.session.commit()
-def start_basic(url):
-    Basic_url.query.filter(Basic_url.url == url).update({"status": True})
-    db.session.commit()
-# db_type -> url ou args ou val
-def change_basic(url,db_type,val):
-    print('\n')
-    print('\n')
-    print('\n')
-    print(db_type)
-    print('\n')
-    print('\n')
-    print('\n')
-    
-    Basic_url.query.filter(Basic_url.url == url).update({db_type: val})
-    db.session.commit()
-""" 
-def change_basic_url(url,new_url):
-    Basic_url.query.filter(Basic_url.url == url).update({"url": new_url})
-    db.session.commit()
-def change_basic_args(url,args):
-    Basic_url.query.filter(Basic_url.url == url).update({"args": args})
-    db.session.commit() 
-"""
-def remove_basic(url):
-    Basic_url.query.filter(Basic_url.url == url).delete()
-    db.session.commit()
+db.init_app(app)
 
    
-# return url's with keys
-def get_keys():
-    return Key_url.query.all()
-def check_keys_url(url):
-    return Key_url.query.filter(Key_url.url == url).first()
-def get_key_status(val):
-    return Key_url.query.filter_by(Key_url.status==val)
-def pause_key(url):
-    Key_url.query.filter(Key_url.url == url).update({"status": False})
-    db.session.commit()
-def start_key(url):
-    Key_url.query.filter(Key_url.url == url).update({"status": False})
-    db.session.commit()
-# db_type -> url,args,key
-def change_key(url,db_type,val):
-    Key_url.query.filter(Key_url.url == url).update({db_type: val})
-    db.session.commit()
-""" 
-def change_key_url(url,new_url):
-    Key_url.query.filter(Key_url.url == url).update({"status": False})
-    db.session.commit()
-def change_key_args(url,args):
-    Key_url.query.filter(Key_url.url == url).update({"status": False})
-    db.session.commit()
-def change_key_key(url,key):
-    Key_url.query.filter(Key_url.url == url).update({"status": False})
-    db.session.commit() 
-"""
-def remove_key(url):
-    Key_url.query.filter(Key_url.url == url).delete()
-    db.session.commit()
-
-def get_tokens():
-    return Token_url.query.all()
-def check_tokens_url(url):
-    return Token_url.query.filter(Token_url.url == url).first()
-def get_token_status(val):
-    return Key_url.query.filter_by(Token_url.status==val)
-def pause_token(url):
-    Token_url.query.filter(Token_url.url == url).update({"status": False})
-def start_token(url):
-    Token_url.query.filter(Token_url.url == url).update({"status": True})
-def change_token(url,db_type,val):
-    Key_url.query.filter(Token_url.url == url).update({db_type: val})
-    db.session.commit()
-""" 
-def change_token_url(url,new_url):
-    Key_url.query.filter(Key_url.url == url).update({"url": new_url})
-    db.session.commit()
-def change_token_args(url,args):
-    Key_url.query.filter(Key_url.url == url).update({"args": args})
-    db.session.commit()
-def change_token_key(url,key):
-    Key_url.query.filter(Key_url.url == url).update({"key": key})
-    db.session.commit() 
-def change_token_content(url,content_type):
-    Key_url.query.filter(Key_url.url == url).update({"content": content_type})
-    db.session.commit()
-def change_token_auth(url,auth):
-    Key_url.query.filter(Key_url.url == url).update({"author": auth})
-    db.session.commit()
-def change_token_secret(url,secret):
-    Key_url.query.filter(Key_url.url == url).update({"secret": secret})
-    db.session.commit() 
-"""
-def remove_token(url):
-    Token_url.query.filter(Token_url.url == url).delete()
-    db.session.commit()    
-    
     
 # ________________________ DB MODELS _______________________________
 class Basic_url(db.Model):
-    __tablename__ = 'Basic_url' 
+    #__tablename__ = 'Basic_url' 
     url = db.Column(db.String(500),primary_key=True,nullable=False,unique=True)
     args = db.Column(JSON,nullable=True)
+    period = db.Column(db.Integer())
     status = db.Column(db.Boolean(),nullable=False)
     def __repr__(self):
-        return f"API(URL = {self.url}, args = {self.args}, status = {self.status})"
+        return f"API(URL = {self.url}, args = {self.args}, period={self.period}, status = {self.status})"
       
 class Key_url(db.Model):
-    __tablename__ = 'Key_url' 
+    #__tablename__ = 'Key_url' 
     url = db.Column(db.String(500),primary_key=True,nullable=False,unique=True)
     args = db.Column(JSON,nullable=True)
+    period = db.Column(db.Integer())
     key = db.Column(db.String(300))
     status = db.Column(db.Boolean())
     def __repr__(self):
-        return f"API(URL={self.url}, args={self.args}, status={self.status})"
+        return f"API(URL={self.url}, args={self.args}, period={self.period},status={self.status})"
     
 class Token_url(db.Model):
-    __tablename__ = 'Token_url' 
+    #__tablename__ = 'Token_url' 
     url = db.Column(db.String(500),primary_key=True,nullable=False,unique=True)
     args = db.Column(JSON,nullable=True)
+    period = db.Column(db.Integer())
     key = db.Column(db.String(300))
     secret = db.Column(db.String(300))
     content_type = db.Column(db.String(50))
     auth_type = db.Column(db.String(50))
     status = db.Column(db.Boolean())
     def __repr__(self):
-        return f"API(URL={self.url}, args={self.args}, status={self.status})"
+        return f"API(URL={self.url}, args={self.args}, period={self.period}, status={self.status})"
 
 db.create_all()
-#   AUTHENTICATION TOKEN
+#db.session.commit()
 
+# __________________________ DB QUERYS _____________________________
+class Query:
+    # return basic url's
+    def get_basics():
+        return Basic_url.query.all()
+    def check_basics_url(url):
+        return Basic_url.query.filter(Basic_url.url == url).first()
+    def get_basic_status(val):
+        return Key_url.query.filter_by(Basic_url.status==val)
+    def pause_basic(url):
+        Basic_url.query.filter(Basic_url.url == url).update({"status": False})
+        db.session.commit()
+    def start_basic(url):
+        Basic_url.query.filter(Basic_url.url == url).update({"status": True})
+        db.session.commit()
+    def change_basic(url,db_type,val):
+        Basic_url.query.filter(Basic_url.url == url).update({db_type: val})
+        db.session.commit()
+    def remove_basic(url):
+        Basic_url.query.filter(Basic_url.url == url).delete()
+        db.session.commit()
+    # só com status=True
+    def get_basic_period(val=5):
+        print('ADASDASDASASD')
+        return Basic_url.query.filter(Basic_url.status==True,Basic_url.period==val).all()
+    # ...
+    
+    
+    # return url's with keys
+    def get_keys():
+        return Key_url.query.all()
+    def check_keys_url(url):
+        return Key_url.query.filter(Key_url.url == url).first()
+    def get_key_status(val):
+        return Key_url.query.filter_by(Key_url.status==val)
+    def pause_key(url):
+        Key_url.query.filter(Key_url.url == url).update({"status": False})
+        db.session.commit()
+    def start_key(url):
+        Key_url.query.filter(Key_url.url == url).update({"status": False})
+        db.session.commit()
+    def change_key(url,db_type,val):
+        Key_url.query.filter(Key_url.url == url).update({db_type: val})
+        db.session.commit()
+    def remove_key(url):
+        Key_url.query.filter(Key_url.url == url).delete()
+        db.session.commit()
+    # só com status=True
+    def get_key_period(val):
+        return Key_url.query.filter(status=True,period=val).all()
+
+
+
+    def get_tokens():
+        return Token_url.query.all()
+    def check_tokens_url(url):
+        return Token_url.query.filter(Token_url.url == url).first()
+    def get_token_status(val):
+        return Key_url.query.filter_by(Token_url.status==val)
+    def pause_token(url):
+        Token_url.query.filter(Token_url.url == url).update({"status": False})
+    def start_token(url):
+        Token_url.query.filter(Token_url.url == url).update({"status": True})
+    def change_token(url,db_type,val):
+        Key_url.query.filter(Token_url.url == url).update({db_type: val})
+        db.session.commit()
+    def remove_token(url):
+        Token_url.query.filter(Token_url.url == url).delete()
+        db.session.commit()    
+    # só com status=True
+    def get_token_period(val):
+        return Token_url.query.filter(Token_url.status==True,Token_url.period==val).all()
+    # ...
+
+#   AUTHENTICATION TOKEN
 app.config['SECRET_KEY'] = 'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'
 @app.route('/login', methods=['GET'])
 def login():
@@ -223,14 +183,16 @@ daemons = {1:{"name":"recolha de kpis", "metric": '1 hora', "url":"www.current.p
 def api_add_daemon_Basic():
     if 'url' not in request.args.keys():
         return "Missing [url] Argument",400
-    if check_basics_url(request.args['url']):
+    if Query.check_basics_url(request.args['url']):
         return "URL already exists",403
     
     aux = None
     if 'args' in request.args.keys():
         aux = request.args['args']
     
-    basic_obj = Basic_url(url=request.args['url'],args=aux,status=True)
+    period = 5 if not 'period' in request.args else request.args['period']
+    
+    basic_obj = Basic_url(url=request.args['url'],args=aux,period=period,status=True)
     db.session.add(basic_obj)
     db.session.commit()
     
@@ -239,25 +201,25 @@ def api_add_daemon_Basic():
 @app.route('/Daemon/Pause/Basic/<string:daemon_url>',methods=['GET'])
 @token_required 
 def api_pause_basic(daemon_url):
-    if not check_basics_url(daemon_url):
+    if not Query.check_basics_url(daemon_url):
         return "DAEMON URL NOT FOUND",403
     
-    change_basic(daemon_url,"status",False)
+    Query.change_basic(daemon_url,"status",False)
     return "DAEMON PAUSED",201
 
 @app.route('/Daemon/Start/Basic/<string:daemon_url>',methods=['GET'])
 @token_required 
 def api_start_basic(daemon_url):
-    if not check_basics_url(daemon_url):
+    if not Query.check_basics_url(daemon_url):
         return "DAEMON URL NOT FOUND",403
     
-    change_basic(daemon_url,"status",True)
+    Query.change_basic(daemon_url,"status",True)
     return "DAEMON STARTED",201
 
 @app.route('/Daemon/Print/Basic', methods=['GET'])
 @token_required
 def api_print_basics():
-    get_basics()
+    print(Query.get_basics())
     return "PRINTED",201
 
 @app.route('/Daemon/Remove/Basic', methods=['GET'])
@@ -265,20 +227,26 @@ def api_print_basics():
 def api_remove_basic():
     if not 'url' in request.args.keys():
         return 'Missing [url] Argument',400
-    if not check_basics_url(request.args['url']):
+    if not Query.check_basics_url(request.args['url']):
         return 'DAEMON URL NOT FOUND',403
     
-    remove_basic(request.args['url'])
+    Query.remove_basic(request.args['url'])
     return 'REMOVED',201
 
 @app.route('/Daemon/Change/Basic/<string:daemon_url>',methods=['GET'])
 @token_required 
 def api_change_basic(daemon_url):
-    if not check_basics_url(daemon_url):
+    if not Query.check_basics_url(daemon_url):
         return "DAEMON URL NOT FOUND",403
     for db_type in [val for val in request.args.keys() if val!='url']: 
-        change_basic(daemon_url,db_type,request.args[db_type])
+        Query.change_basic(daemon_url,db_type,request.args[db_type])
     return "DAEMON STARTED",201
+
+@app.route('/Daemon/Basic/Period/<int:period>',methods=['GET'])
+@token_required 
+def api_period_basic(period):
+    print(Query.get_basic_period(period))
+    return "PRINTED DAEMONS FREQ 5",201
 
 
 # ____________________________ KEY __________________________________
@@ -287,7 +255,7 @@ def api_change_basic(daemon_url):
 def api_add_daemon_key():
     if 'url' not in request.args.keys():
         return "Missing [url] Argument",400
-    if check_keys_url(request.args['url']):
+    if Query.check_keys_url(request.args['url']):
         return 'URL already exists',403
     if 'key' not in request.args.keys():
         return "Missing [key] Argument",400
@@ -296,7 +264,9 @@ def api_add_daemon_key():
     if 'args' in request.args.keys():
         aux = request.args['args']
     
-    key_obj = Key_url(url=request.args['url'],args=aux,status=True)
+    period = 5 if not 'period' in request.args else request.args['period']
+    
+    key_obj = Key_url(url=request.args['url'],args=aux,period=period,key=request.args['key'],status=True)
     db.session.add(key_obj)
     db.session.commit()
     
@@ -305,10 +275,10 @@ def api_add_daemon_key():
 @app.route('/Daemon/Pause/Key/<string:daemon_url>',methods=['GET'])
 @token_required 
 def api_pause_key(daemon_url):
-    if not check_keys_url(daemon_url):
+    if not Query.check_keys_url(daemon_url):
         return "Missing [url] Argument",400
     
-    change_key(daemon_url,"status",False)
+    Query.change_key(daemon_url,"status",False)
     return "DAEMON PAUSED",201
 
 @app.route('/Daemon/Start/Key/<string:daemon_url>',methods=['GET'])
@@ -317,13 +287,13 @@ def api_start_key(daemon_url):
     if not check_keys_url(daemon_url):
         return "DAEMON URL NOT FOUND",403
     
-    change_key(daemon_url,"status",True)
+    Query.change_key(daemon_url,"status",True)
     return "DAEMON STARTED",201
 
 @app.route('/Daemon/Print/Key', methods=['GET'])
 @token_required
 def api_print_keys():
-    get_keys()
+    Query.get_keys()
     return "PRINTED",201
 
 @app.route('/Daemon/Remove/Key', methods=['GET'])
@@ -331,10 +301,10 @@ def api_print_keys():
 def api_remove_key():
     if not 'url' in request.args.keys():
         return 'Missing [url] Argument',400
-    if not check_keys_url(request.args['url']):
+    if not Query.check_keys_url(request.args['url']):
         return 'DAEMON URL NOT FOUND',403
     
-    remove_key(request.args['url'])
+    Query.remove_key(request.args['url'])
     return 'REMOVED',201
 
 @app.route('/Daemon/Change/Key/<string:daemon_url>',methods=['GET'])
@@ -342,12 +312,17 @@ def api_remove_key():
 def api_change_key(daemon_url):
     if not 'url' in request.args.keys():
         return 'Missing [url] Argument',400
-    if not check_keys_url(daemon_url):
+    if not Query.check_keys_url(daemon_url):
         return "DAEMON URL NOT FOUND",403
     for db_type in [val for val in request.args.keys() if val!='url']: 
-        change_key(daemon_url,db_type,request.args[db_type])
+        Query.change_key(daemon_url,db_type,request.args[db_type])
     return "DAEMON STARTED",201
 
+@app.route('/Daemon/Key/Period/<int:period>',methods=['GET'])
+@token_required 
+def api_period_key(period):
+    print(Query.get_key_period(period))
+    return "PRINTED DAEMONS FREQ 5",201
 
 # ______________________________Token __________________________________
 
@@ -356,7 +331,7 @@ def api_change_key(daemon_url):
 def api_add_daemon_Token():
     if 'url' not in request.args.keys():
         return "Missing [url] Argument",400
-    if check_tokens_url(request.args['url']):
+    if Query.check_tokens_url(request.args['url']):
         return 'URL Already Exists',403
     if 'key' not in request.args.keys():
         return "Missing [key] Argument",400
@@ -371,7 +346,9 @@ def api_add_daemon_Token():
     if 'args' in request.args.keys():
         aux = request.args['args']
     
-    token_obj = Token_url(url=request.args['url'],args=aux,status=True)
+    period = 5 if not 'period' in request.args else request.args['period']
+    
+    token_obj = Token_url(url=request.args['url'],args=aux,period=period,status=True,key=request.args['key'],secret=request.args['secret'],content_type=request.args['content_type'],auth_type=request.args['auth_type'])
     db.session.add(token_obj)
     db.session.commit()
     
@@ -380,25 +357,25 @@ def api_add_daemon_Token():
 @app.route('/Daemon/Pause/Token/<string:daemon_url>',methods=['GET'])
 @token_required 
 def api_pause_token(daemon_url):
-    if not check_tokens_url(daemon_url):
+    if not Query.check_tokens_url(daemon_url):
         return "DAEMON URL NOT FOUND",403
     
-    change_token(daemon_url,"status",False)
+    Query.change_token(daemon_url,"status",False)
     return "DAEMON PAUSED",201
 
 @app.route('/Daemon/Start/Token/<string:daemon_url>',methods=['GET'])
 @token_required 
 def api_start_token(daemon_url):
-    if not check_tokens_url(daemon_url):
+    if not Query.check_tokens_url(daemon_url):
         return "DAEMON URL NOT FOUND",403
     
-    change_token(daemon_url,"status",True)
+    Query.change_token(daemon_url,"status",True)
     return "DAEMON STARTED",201
 
 @app.route('/Daemon/Print/Token', methods=['GET'])
 @token_required
 def api_print_tokens():
-    get_tokens()
+    Query.get_tokens()
     return "PRINTED",201
 
 @app.route('/Daemon/Remove/Token', methods=['GET'])
@@ -406,10 +383,10 @@ def api_print_tokens():
 def api_remove_token():
     if not 'url' in request.args.tokens():
         return 'Missing [url] Argument',400
-    if not check_tokens_url(request.args['url']):
+    if not Query.check_tokens_url(request.args['url']):
         return 'DAEMON URL NOT FOUND',403
     
-    remove_token(request.args['url'])
+    Query.remove_token(request.args['url'])
     return 'REMOVED',201
 
 @app.route('/Daemon/Change/Token/<string:daemon_url>',methods=['GET'])
@@ -417,14 +394,17 @@ def api_remove_token():
 def api_change_token(daemon_url):
     if not 'url' in request.args.keys():
         return 'Missing [url]',400
-    if not check_keys_url(daemon_url):
+    if not Query.check_keys_url(daemon_url):
         return "DAEMON URL NOT FOUND",403
     for db_type in [val for val in request.args.keys() if val!='url']: 
-        change_key(daemon_url,db_type,request.args[db_type])
+        Query.change_key(daemon_url,db_type,request.args[db_type])
     return "DAEMON STARTED",201
 
-
-# SQL ABORTS
+@app.route('/Daemon/Token/Period/<int:period>',methods=['GET'])
+@token_required 
+def api_period_token(period):
+    print(Query.get_token_period(period))
+    return "PRINTED DAEMONS FREQ 5",201
 
 
 # DAEMON ABORTS
