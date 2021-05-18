@@ -13,6 +13,9 @@ from api_daemon import Query
 from api_daemon import db
 from api_daemon import app
 from api_daemon import Basic_url
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
+print(basedir)
 
 print("_________________ PRINT BASIC DAEMON REQUEST __________________")
 r = requests.get('http://127.0.0.1:5000/Daemon/Print/Basic',headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})

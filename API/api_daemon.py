@@ -8,7 +8,7 @@
 # cada vez que se remove um daemon do backoffice se não tiver mais nenhum 
 # remover dos daemons e da influx db?
 
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response,url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api,Resource,reqparse,abort
 from sqlalchemy.dialects.postgresql import JSON
@@ -16,18 +16,28 @@ import json
 import jwt
 import datetime
 from functools import wraps
-
+import os
+print('\n')
+basedir = os.path.abspath(os.path.dirname(__file__))
+print(basedir)
+print('\n')
 
 app = Flask(__name__)
-api = Api(app)
-app.config['SQLALCHEMY_DATEBASE_URI'] = 'sqlite:///site.db'
+#print(os.environ.get('DATABASE_URL') or \
+#        'sqlite:///' + os.path.join(basedir, 'app.db'))
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'daemons_db.db')
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mnt/c/Users/alexg/OneDrive/Desktop/PEI/DAEMONS/Api/app.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.db')
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\Users\\alexg\\Onedrive\\Desktop\\PEI\\DAEMONS\\Api\\daemon.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 #C:\Users\alexg\OneDrive\Desktop\PEI\DAEMONS
-#app.config['SQLALCHEMY_DATEBASE_URI'] = 'sqlite:///C:\\Users\\alexg\\Onedrive\\Desktop\\PEI\\DAEMONS\\API\\daemon.db'
-app.config['SQLALCHEMY_ECHO'] = False
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-db.init_app(app)
-
+#db.init_app(app)
+api = Api(app)
    
     
 # ________________________ DB MODELS _______________________________
