@@ -1,5 +1,5 @@
 
-API dos DAEMONS para gestão no BackOffice 
+API dos DAEMONS para gestão apatir do BackOffice 
 
 1. Crie um virtual environment:
 ```bash
@@ -14,4 +14,10 @@ source venv/bin/activate
 3. Instale os requisitos:
 ```bash
 pip install -r requirements.txt
+```
+
+
+4. Update requisitos:
+```bash
+pip-review --auto
 ```

@@ -10,25 +10,17 @@ if r.status_code < 400:
     print(r)
 print()  
 
-print("_________________ ADD BASIC DAEMON REQUEST __________________")
-r = requests.get('http://127.0.0.1:5000/Daemon/Add/Basic',{"url":"www.dated1.pt","period":15},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+
+print("_________________ ADD WIFI TOKEN DAEMON REQUEST __________________")
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"url":"www.dated2.pt","args":"first,count,clientCount,macAddress,location","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
 print(r.status_code)
 print(r.text)
 if r.status_code < 400:
     print(r)
 print()
 
-print("_________________ ADD BASIC DAEMON REQUEST __________________")
-r = requests.get('http://127.0.0.1:5000/Daemon/Add/Basic',{"url":"www.dated2.pt"},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
-print(r.status_code)
-print(r.text)
-if r.status_code < 400:
-    print(r)
-print()
-
-print("_________________ ADD BASIC DAEMON REQUEST __________________")
-args = {"1":"arg1","2":"arg2","3":["arg3","arg4","arg5"]}
-r = requests.get('http://127.0.0.1:5000/Daemon/Add/Basic',{"url":"www.dated3.pt","args":json.dumps(args)},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print("_________________ ADD PARKING BASIC DAEMON REQUEST __________________")
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Basic',{"url":"http://services.web.ua.pt/parques/parques","args":"Nome,Capacidade,Ocupado,Livre"},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
 print(r.status_code)
 print(r.text)
 if r.status_code < 400:
@@ -68,7 +60,7 @@ if r.status_code < 400:
 print()   
 
 print("_________________ CHANGE BASIC DAEMON args REQUEST __________________")
-r = requests.get('http://127.0.0.1:5000/Daemon/Change/Basic/www.dated2.pt',{"args":json.dumps(args)},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+r = requests.get('http://127.0.0.1:5000/Daemon/Change/Basic/www.dated2.pt',{"url":"www.dated3.pt"},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
 print(r.status_code)
 print(r.text)
 if r.status_code < 400:

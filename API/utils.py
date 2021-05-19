@@ -12,6 +12,11 @@ from datetime import datetime
 def make_request(url):
     r = requests.get(url)
     if r.status_code == 200:
+        print('\n')
+        print('\n')
+        print(r.json())
+        print('\n')
+        print('\n')
         return r.json()
     return display_error(r.status_code)
 
@@ -30,7 +35,7 @@ def make_request_token(url,token):
 # para o wso2 content_type -> application/x-www-form-urlencoded | auth_type -> Bearer
 def get_token(url,key,secret,content_type=None,auth_type=None):
     msg = encode_b64(key+':'+secret)
-    print(msg=='al9tR25keEsyV0xLRVVLYkdya1g3bjF1eEFFYTpCcnN6SDhvRjlRc0hSamlPQUMxRDlaZTBJbG9h')
+    #print(msg=='al9tR25keEsyV0xLRVVLYkdya1g3bjF1eEFFYTpCcnN6SDhvRjlRc0hSamlPQUMxRDlaZTBJbG9h')
     request_token = requests.post(url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg})
     if request_token.status_code < 400:
         print('Token OK!')
@@ -69,21 +74,34 @@ def create_entry(measurement, tags, timestamp, fields):
 
 # só pode receber certos tipos de dados ...
 def filter_request(vals,args):
-    aux = list(vals.keys())    
-    for field in [field for field in aux if field not in args]:
-        if isinstance(vals[field],list) or isinstance(vals[field],set):
-            i=0
-            for v in vals[field]:
-                vals[field][i] = filter_request(v,args)  
-                i+=1
+      
+    for field in [field for field in vals if field not in args]:
+        if isinstance(field,str):
+            if isinstance(vals[field],list) or isinstance(vals[field],set):
+                i=0
+                for v in vals[field]:
+                    vals[field][i] = filter_request(v,args)  
+                    i+=1
+                continue
+            if isinstance(vals[field],dict):
+                for key in vals[field].keys():
+                    if not key in args:
+                        del vals[key]
+                continue
+            if not field in args:
+                del vals[field]
+            continue  
+        if isinstance(field,dict):
+            filter_request(field,args)
+            continue 
+        if isinstance(field,list):
+            for v in field:
+                filter_request(v,args) 
             continue
-        if isinstance(vals[field],dict):
-            for key in vals[field].keys():
-                if not key in args:
-                    del vals[key]
-            continue
-        if not field in args:
-            del vals[field]
+        return 'UNKNOWN FORMAT'
+    for val in vals:
+        if not val:
+            vals.remove(val)
     return vals
 
 def filter_request_add(vals,args):
@@ -109,7 +127,8 @@ def filter_request_add(vals,args):
 #args = {"accessPoints"}
 # depois testar 
 #args = {"accessPoints": ["clientCount","macAddress","location"]}
-""" args = ["first","count","clientCount","macAddress","location"]
+
+args = ["first","count","clientCount","macAddress","location"]
 
 url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='
 token_url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
@@ -121,14 +140,12 @@ key = 'j_mGndxK2WLKEUKbGrkX7n1uxAEa'
 token = get_token(token_url,key,secret,content_type,auth_type)
 for i in range(8):
     r = make_request_token(url+str(i*100),token)
-    print(r['accessPoints'][0]['macAddress'])
+    #print(r['accessPoints'][0]['macAddress'])
     data = filter_request(r,args)
-    
-        
     print(data)
-    print('\n')
-    print(data['accessPoints'][0])
-    print('\n')
-    print(data["accessPoints"])
-    print('\n') """
+    #print('\n')
+    #print(data['accessPoints'][0])
+    #print('\n')
+    #print(data["accessPoints"])
+    #print('\n') 
     
