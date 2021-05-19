@@ -29,11 +29,13 @@ for val in Query.get_basic_period(5):
     print(val.url)
     print(val.args)
     
-    print(args)
+    print(val.args)
     try:
         request_vals = make_request(val.url)
         if val.args:
-            args = val.args.split(',').strip()
+            args = val.args.split(',')
+            for i in range(0,len(args)):
+                args[i]=args[i].strip()
             try:
                 request_vals = filter_request(request_vals,args)
             except:
@@ -45,7 +47,7 @@ for val in Query.get_basic_period(5):
         print(Query.get_basic_period(5))
         Query.start_basic(val.url)
         print(Query.get_basic_period(5))
-    request_vals = filter_request(request_vals,args)
+    #request_vals = filter_request(request_vals,args)
     
     
 for val in Query.get_basic_period(15): 

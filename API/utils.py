@@ -127,7 +127,7 @@ def filter_request_add(vals,args):
 #args = {"accessPoints"}
 # depois testar 
 #args = {"accessPoints": ["clientCount","macAddress","location"]}
-
+"""
 args = ["first","count","clientCount","macAddress","location"]
 
 url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='
@@ -148,4 +148,4 @@ for i in range(8):
     #print('\n')
     #print(data["accessPoints"])
     #print('\n') 
-    
+"""
