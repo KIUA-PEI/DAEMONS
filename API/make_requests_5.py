@@ -197,10 +197,10 @@ def main():
     # start influxDBClient
     influx = InfluxDBClient(host='127.0.0.1', port=8086, username="daemon", password="daemon_1234")
     # add jobs
-    scheduler.add_job(requests_basic, trigger="interval", args=[influx], minutes=1, id="5minjob_basic", next_run_time=datetime.now())
-    scheduler.add_job(requests_key, trigger="interval", args=[influx], minutes=1, id="5minjob_key", next_run_time=datetime.now())
-    scheduler.add_job(requests_http, trigger="interval", args=[influx], minutes=1, id="5minjob_http", next_run_time=datetime.now())
-    scheduler.add_job(requests_token, trigger="interval", args=[influx], minutes=1, id="5minjob_token", next_run_time=datetime.now())
+    scheduler.add_job(requests_basic, trigger="interval", args=[influx], minutes=5, id="5minjob_basic", next_run_time=datetime.now())
+    scheduler.add_job(requests_key, trigger="interval", args=[influx], minutes=5, id="5minjob_key", next_run_time=datetime.now())
+    scheduler.add_job(requests_http, trigger="interval", args=[influx], minutes=5, id="5minjob_http", next_run_time=datetime.now())
+    scheduler.add_job(requests_token, trigger="interval", args=[influx], minutes=5, id="5minjob_token", next_run_time=datetime.now())
     # start the scheduler
     scheduler.start()
     try:
