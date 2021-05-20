@@ -12,11 +12,6 @@ from datetime import datetime
 def make_request(url):
     r = requests.get(url)
     if r.status_code == 200:
-        print('\n')
-        print('\n')
-        print(r.json())
-        print('\n')
-        print('\n')
         return r.json()
     return display_error(r.status_code)
 
@@ -26,10 +21,16 @@ def make_request_key(url,key):
         return r.json()
     return display_error(r.status_code) 
         
+def make_request_http(url,user,key):
+    pass
+        
 def make_request_token(url,token):
+    print('REQUESTING')
     r = requests.get(url,headers={'Authorization': token})
     if r.status_code == 200:
+        print('NICE')
         return r.json()
+    print('NOT NICE')
     return display_error(r.status_code)
 
 # para o wso2 content_type -> application/x-www-form-urlencoded | auth_type -> Bearer
@@ -44,6 +45,8 @@ def get_token(url,key,secret,content_type=None,auth_type=None):
     print(request_token)
     return display_error(request_token.status_code)
 
+def send_influx():
+    pass
 
 def display_error(request_status):
     if request_status == 400:
@@ -127,7 +130,7 @@ def filter_request_add(vals,args):
 #args = {"accessPoints"}
 # depois testar 
 #args = {"accessPoints": ["clientCount","macAddress","location"]}
-"""
+
 args = ["first","count","clientCount","macAddress","location"]
 
 url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='
@@ -140,6 +143,7 @@ key = 'j_mGndxK2WLKEUKbGrkX7n1uxAEa'
 token = get_token(token_url,key,secret,content_type,auth_type)
 for i in range(8):
     r = make_request_token(url+str(i*100),token)
+    print('YES\n')
     #print(r['accessPoints'][0]['macAddress'])
     data = filter_request(r,args)
     print(data)
@@ -148,4 +152,4 @@ for i in range(8):
     #print('\n')
     #print(data["accessPoints"])
     #print('\n') 
-"""
+
