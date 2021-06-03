@@ -6,34 +6,62 @@ import requests
 import json
 import base64
 import pytz
+import signal 
 from pytz import timezone, common_timezones
 from datetime import datetime
+from make_requests import influx
+
+class TimeoutException(Exception):   # Custom exception class
+    pass
+
+def timeout_handler(signum, frame):   # Custom signal handler
+    raise TimeoutException
+
+signal.signal(signal.SIGALRM, timeout_handler)
 
 def make_request(url):
-    r = requests.get(url)
-    if r.status_code == 200:
-        return r.json()
-    return display_error(r.status_code)
+    signal.alarm(60) 
+    try:
+        r = requests.get(url)
+        if r.status_code == 200:
+            return r.json()
+        return display_error(r.status_code)
+    except TimeoutException:
+        return False
+        
 
 def make_request_key(url,key):
-    return requests.get(url,headers={'Authorization': key})
-        
+    signal.alarm(60) 
+    try:
+        return requests.get(url,headers={'Authorization': key})
+    except TimeoutException:
+        return False
 def make_request_http(url,user,key):
-    return requests.get(url,headers={"userName": user , "password": key})
-        
+    signal.alarm(60) 
+    try:
+        return requests.get(url,headers={"userName": user , "password": key})
+    except TimeoutException:
+        return False   
 def make_request_token(url,token):
-    return requests.get(url,headers={'Authorization': token})
-    
+    signal.alarm(60) 
+    try:
+        return requests.get(url,headers={'Authorization': token})
+    except TimeoutException:
+        return False 
 
 # para o wso2 content_type -> application/x-www-form-urlencoded | auth_type -> Bearer
 def get_token(url,key,secret,content_type=None,auth_type=None):
-    msg = encode_b64(key+':'+secret)
-    #print(msg=='al9tR25keEsyV0xLRVVLYkdya1g3bjF1eEFFYTpCcnN6SDhvRjlRc0hSamlPQUMxRDlaZTBJbG9h')
-    request_token = requests.post(url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg})
-    if request_token.status_code < 400:
-        return auth_type + ' ' + request_token.json()['access_token'] if auth_type else request_token.json()
-    return False
-
+    signal.alarm(60) 
+    try:
+        msg = encode_b64(key+':'+secret)
+        #print(msg=='al9tR25keEsyV0xLRVVLYkdya1g3bjF1eEFFYTpCcnN6SDhvRjlRc0hSamlPQUMxRDlaZTBJbG9h')
+        request_token = requests.post(url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg})
+        if request_token.status_code < 400:
+            return auth_type + ' ' + request_token.json()['access_token'] if auth_type else request_token.json()
+        return False
+    except TimeoutException:
+        return False 
+    
 def send_influx():
     pass
 
@@ -96,33 +124,44 @@ def filter_request(vals,args):
             if not val:
                 vals.remove(val)
     return vals
-
-def filter_request_add(vals,args):
-    result = {}
-    
-    for field in vals.keys():
-        if isinstance(vals[field],list) or isinstance(vals[field],set):
-            for v in vals[field]:
-                aux = filter_request(v,args)
-                for key in aux:
-                    if key in result:
-                        result[key] += aux[key]
-                    else:
-                        result[key] = aux[key]   
-            continue
-        if field in args:
-            print(vals[field])
-            result[field] = vals[field]
-    return result
-
-# test filter_request
-
-#args = {"accessPoints"}
-# depois testar 
-#args = {"accessPoints": ["clientCount","macAddress","location"]}
+#clientCount by location ... tem que estar tudo no mesmo field
+def send_influx(data,args):
+    for field in [field for field in data]:    
+        if isinstance(field,str):
+            if field == args[0]:
+                result = [{"measurment":"table_name","Timestamp" : str(get_timestamp())}, data[field]]
+                for val in data:
+                    if val in args[1:]:
+                        print(field)
+                        result.append(data[val])
+                print('SEND TO INFLUX: ')
+                print(result)  
+                if influx:
+                    try:
+                        #[{"measurement": measurement, "tags" : tags, "time" : timestamp, "fields": fields}]
+                        influx.write_points(json.dumps(result), database="Metrics")       
+                    except:
+                        print('INFLUX DOWN')    
+                pass
+            elif isinstance(data[field],dict):
+                send_influx(data[field],args)    
+            elif not isinstance(data[field],str) and isinstance(data[field],list):
+                send_influx(data[field],args)    
+        if isinstance(field,dict):
+            send_influx(field,args)
+        if isinstance(field,list):
+            send_influx(field,args)
+                
+def get_timestamp():
+    portugal_tz = timezone("Europe/Lisbon")
+    return portugal_tz.localize(datetime.now()).isoformat()       
+            
+# gramatica ... clientCount, location and macAddress
+# 
 """
-args = ["first","count","clientCount","macAddress","location"]
-url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/RogueAccessPointAlarm?maxResult=1000&firstResult='
+args = ["clientCount","location","macAddress"]
+url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='
+#url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/RogueAccessPointAlarm?maxResult=1000&firstResult='
 #url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/RogueAccessPointAlarm?id='
 #url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/Building'
 token_url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
@@ -135,15 +174,6 @@ token = get_token(token_url,key,secret,content_type,auth_type)
 for i in range(8):
     r = make_request_token(url+(str(i*10)),token)
     print(r)
-    data = filter_request(r,args)
-    print(data)
-    #print(data['rogueAccessPointAlarms'])
-    for key in data:
-        print(key)
-    #print('\n')
-    #print(data['accessPoints'][0])
-    #print('\n')
-    #print(data["accessPoints"])
-    #print('\n') 
-
+    print(r.json())
+    send_influx(r.json(),args)
 """

@@ -6,7 +6,6 @@ import requests
 from datetime import datetime
 from influxdb import InfluxDBClient
 from apscheduler.schedulers.background import BackgroundScheduler
-from utils import *
 from sqlalchemy import create_engine
 from api_daemon import Query
 
@@ -27,41 +26,26 @@ from make_requests_utils import *
         args[i]=args[i].strip()
 """
 
-def make_request(influx,period):
-    for val in Query.get_basic_period(period):
-        request_vals = request_basic(val)
-        print(request_vals)
-        print(period)
-        try:
-            influx.write_points(request_vals, database="Metrics")       
-        except:
-            print('INFLUX DOWN') 
-    
-    for val in Query.get_key_period(period): 
-        request_vals = request_key(val)
-        print(request_vals)
-        try:
-            influx.write_points(request_vals, database="Metrics")       
-        except:
-            print('INFLUX DOWN') 
+influx = None
+#try:
+    #influx = InfluxDBClient(host='127.0.0.1', port=8086, username="daemon", password="daemon_1234")
+#except:
+#   print('influx down')
 
+def make_request(period):
+    # distinct URL's ... pode ter repetidos
+    for val in Query.get_basic_period(period):
+        request_basic(val)
+        
+    for val in Query.get_key_period(period): 
+        request_key(val)
+        
     for val in Query.get_http_period(period):
-        request_vals = request_http(val)
-        print(request_vals)
-        try:
-            influx.write_points(request_vals, database="Metrics")       
-        except:
-            print('INFLUX DOWN') 
-    
+        request_http(val)
+        
     for val in Query.get_token_period(period):
-        print(val)
-        request_vals = request_token(val)
-        print(request_vals)
-        try:
-            influx.write_points(request_vals, database="Metrics")       
-        except:
-            print('INFLUX DOWN') 
-    
+        request_token(val)
+       
 
 def main():
     print('STARTING ...')
@@ -98,15 +82,15 @@ def main():
         # add jobs
     if True:    
         influx = None
-        scheduler.add_job(make_request, trigger="interval", args=[influx,5], minutes=5, id="5minjob_basic", next_run_time=datetime.now())
+        scheduler.add_job(make_request, trigger="interval", args=[5], minutes=5, id="5minjob_basic", next_run_time=datetime.now())
         
-        scheduler.add_job(make_request, trigger="interval", args=[influx,15], minutes=15, id="15minjob_basic", next_run_time=datetime.now())
+        scheduler.add_job(make_request, trigger="interval", args=[15], minutes=15, id="15minjob_basic", next_run_time=datetime.now())
         
-        scheduler.add_job(make_request, trigger="interval", args=[influx,30], minutes=30, id="30minjob_basic", next_run_time=datetime.now())
+        scheduler.add_job(make_request, trigger="interval", args=[30], minutes=30, id="30minjob_basic", next_run_time=datetime.now())
         
-        scheduler.add_job(make_request, trigger="interval", args=[influx,60], minutes=60, id="60minjob_basic", next_run_time=datetime.now())
+        scheduler.add_job(make_request, trigger="interval", args=[60], minutes=60, id="60minjob_basic", next_run_time=datetime.now())
         
-        scheduler.add_job(make_request, trigger="interval", args=[influx,1440], minutes=1440, id="dailyjob_basic", next_run_time=datetime.now())
+        scheduler.add_job(make_request, trigger="interval", args=[1440], minutes=1440, id="dailyjob_basic", next_run_time=datetime.now())
         
         # start the scheduler
         scheduler.start()

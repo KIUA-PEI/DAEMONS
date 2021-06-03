@@ -1,33 +1,32 @@
 from api_daemon import Query
 from utils import *
+from make_requests import *
 
 tokens = {}
 
 def request_basic(val):
     print('STARTING BASIC\n')
     request = requests.get(val.url)
-    
     if request.status_code < 400:
         if val.args:
-            args = val.args.split(',')
+            args = [arg.strip() for arg in val.args.split(',')]
             try:
-                request_vals = filter_request(request.json(),args)
-                if not request_vals:
-                    print("FILTER FAILED")
-                    Query.pause_basic(val.url)
-                    Query.change_basic(val.url,'error','BAD FILTER (no fields found)')
-                    return False
-                return request_vals
+                send_influx(request.json(),args)
             except:
                 Query.pause_basic(val.url)
                 Query.change_basic(val.url,'error','BAD FORMAT')
                 print("FILTER FAILED")
                 return False
-            
-    Query.pause_basic(val.url)
-    Query.change_basic(val.url,'error',display_error(request.status_code))
-    return False 
-
+        elif influx:
+            print('SEND TO INFLUX')
+            try:
+                influx.write_points(request.json(), database="Metrics")       
+            except:
+                print('INFLUX DOWN')         
+    else:
+        Query.pause_basic(val.url)
+        Query.change_basic(val.url,'error',display_error(request.status_code))
+    return False
 
 def request_key(val):       
     print('STARTING KEY\n')
@@ -35,48 +34,39 @@ def request_key(val):
     request = requests.get(val.url,headers={'Authorization': val.key})
     if request.status_code < 400:
         if val.args:
-            args = val.args.split(',')
+            args = [arg.strip() for arg in val.args.split(',')]
             # filter
             try:
-                request_vals = filter_request(request.json(),args)
-                if not request_vals:
-                    Query.pause_key(val.url)
-                    Query.change_key(val.url,'error','BAD FILTER (no fields found)')
-                    print("FILTER FAILED")
-                    return False
-                return request_vals
+                send_influx(request.json(),args)
             except:
                 Query.pause_key(val.url)
                 Query.change_key(val.url,'error','BAD FORMAT')
                 print("FILTER FAILED")
-                
-    Query.pause_key(val.url)
-    Query.change_key(val.url,'error',display_error(r.status_code))
-    return False 
-
+        else:
+            print('SEND TO INFLUX')       
+    else:
+        Query.pause_basic(val.url)
+        Query.change_basic(val.url,'error',display_error(request.status_code))
+    return False
 
 def request_http(val):  
     print('STARTING HTTP\n')
     request = requests.get(val.url,headers={"userName": val.user , "password": val.key})
     if request.status_code < 400:    
         if val.args:
-            args = val.args.split(',')
+            args = [arg.strip() for arg in val.args.split(',')]
             try:
-                request_vals = filter_request(request_vals,args)
-                if not request_vals:
-                    Query.pause_http(val.url)
-                    Query.change_http(val.url,'error','BAD FILTER (no fields found)')
-                    print("FILTER FAILED")
-                    return False 
-                return request_vals    
+                send_influx(request.json(),args)
             except:
                 Query.change_http(val.url,'error','BAD FORMAT')
                 Query.change_http(val.url,'args','')
-                print("FILTER FAILED")        
-    Query.pause_http(val.url)
-    Query.change_http(val.url,'error',display_error(request.status_code))
+                print("FILTER FAILED")     
+        else:
+            print('SEND TO INFLUX')   
+    else:
+        Query.pause_basic(val.url)
+        Query.change_basic(val.url,'error',display_error(request.status_code))
     return False
-        
         
 def request_token(val):
     print('STARTING TOKEN\n')
@@ -86,11 +76,10 @@ def request_token(val):
     # se o token não estiver disponivel make_request
     if not tokens[val.url]:
         tokens[val.url] = get_token(val.token_url,val.key,val.secret,val.content_type,val.auth_type)
-    
     while 1:
         request = requests.get(val.url,headers={'Authorization': tokens[val.url]})
         # se der erro pedir token
-        if request.status_code == 403:
+        if request.status_code >= 400:
             tokens[val.url] = get_token(val.token_url,val.key,val.secret,val.content_type,val.auth_type)
             # sair do loop se continuar a dar erro
             if check > 3:
@@ -98,34 +87,26 @@ def request_token(val):
                 Query.pause_token(val.url)
                 print("TOKEN REQUEST FAILED")
                 break
+            check += 1
         if request.status_code<=200:
-            check = -1
             break
-        check += 1
-                
-    if request.status_code <= 200:
-            
+        
+    # enviar na função send to send_influx ... e fazer erros na send_influx tmb
+    if request.status_code <= 200:      
         if val.args:
-            args = val.args.split(',')
-            for i in range(0,len(args)):
-                args[i]=args[i].strip()
+            args = [arg.strip() for arg in val.args.split(',')]
             try:
-                request_vals = filter_request(request.json(),args)
-                if not request_vals:
-                    Query.pause_token(val.url)
-                    Query.change_token(val.url,'error','BAD FILTER (no fields found)')
-                    print("FILTER FAILED")
-                    return False 
-                return request_vals
+                # pesquisar args todos os args com o url=val.url
+                # for args in query.args
+                #   send_influx
+                send_influx(request.json(),args)
             except:
                 Query.pause_token(val.url)
                 Query.change_token(val.url,'error','BAD FORMAT')
                 print("FILTER FAILED") 
+        else:
+            print('SEND TO INFLUX')
     else:
-        Query.pause_token(val.url)
-        Query.change_token(val.url,'error',display_error(request.status_code))
-
-    
+        Query.pause_basic(val.url)
+        Query.change_basic(val.url,'error',display_error(request.status_code))
     return False
-        
-        
