@@ -8,9 +8,36 @@ from influxdb import InfluxDBClient
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import create_engine
 from api_daemon import Query
-
 from make_requests_utils import *
+import signal
 
+
+from functools import wraps
+import errno
+import os
+import signal
+"""
+class TimeoutError(Exception):
+    pass
+
+def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+    def decorator(func):
+        def _handle_timeout(signum, frame):
+            raise TimeoutError(error_message)
+
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handle_timeout)
+            signal.alarm(seconds)
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)
+            return result
+
+        return wraps(func)(wrapper)
+
+    return decorator
+"""
 #Query.remove_basic('www.dated1.pt')
 #Query.remove_basic('www.dated2.pt')
 #Query.remove_basic('www.dated3.pt')
@@ -31,21 +58,76 @@ influx = None
     #influx = InfluxDBClient(host='127.0.0.1', port=8086, username="daemon", password="daemon_1234")
 #except:
 #   print('influx down')
+class TimeoutException(Exception):   # Custom exception class
+    pass
+
+def timeout_handler(signum, frame):   # Custom signal handler
+    raise TimeoutException
+
+signal.signal(signal.SIGALRM, timeout_handler)
+
+
 
 def make_request(period):
     # distinct URL's ... pode ter repetidos
+    """
+    x=0
+    signal.alarm(15) 
+    try:         
+        while 1:
+            x+=1 
+    except TimeoutException:
+            print('TIME EXCEPTION')  
+    finally:
+        signal.alarm(0)
+    print(x)
+    """ 
     for val in Query.get_basic_period(period):
-        request_basic(val)
+        print('basic')
+        print(val[0])
+        print('\n')
+        signal.alarm(60) 
+        try:
         
+            request_basic(val[0])
+        except TimeoutException:
+            print('TIME EXCEPTION')
+            pass
+        
+    
     for val in Query.get_key_period(period): 
-        request_key(val)
+        print('key')
+        print(val)
+        print('\n')
+        signal.alarm(60) 
+        try:
+            request_key(val)
+        except TimeoutException:
+            print('TIME EXCEPTION')
+            pass
         
     for val in Query.get_http_period(period):
-        request_http(val)
-        
+        print('http')
+        print(val)
+        print('\n')
+        signal.alarm(60) 
+        try:
+            request_http(val)
+        except TimeoutException:
+            print('TIME EXCEPTION')
+            pass
+            
     for val in Query.get_token_period(period):
-        request_token(val)
-       
+        print('token')
+        print(val)
+        print('\n')
+        signal.alarm(60) 
+        try:
+            request_token(val)
+        except TimeoutException:
+            print('TIME EXCEPTION')
+            pass
+     
 
 def main():
     print('STARTING ...')

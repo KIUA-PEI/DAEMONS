@@ -29,7 +29,7 @@ class Basic_url(db.Model):
     period = db.Column(db.Integer())
     status = db.Column(db.Boolean(),nullable=False,default=True)
     def __repr__(self):
-        return f"API(ID={self.metric_id},URL = {self.url}, period={self.period}, status = {self.status})"
+        return f"API(ID={self.metric_id},URL = {self.url}, period={self.period}, status = {self.status}, args={self.args})"
       
 class Key_url(db.Model):
     metric_id = db.Column(db.Integer(),primary_key=True)
@@ -39,7 +39,7 @@ class Key_url(db.Model):
     key = db.Column(db.String(300))
     status = db.Column(db.Boolean(),nullable=False,default=True)
     def __repr__(self):
-        return f"API(ID={self.metric_id},URL={self.url}, period={self.period},status={self.status})"
+        return f"API(ID={self.metric_id},URL={self.url}, period={self.period},status={self.status}, args={self.args})"
     
 class Http_url(db.Model):
     metric_id = db.Column(db.Integer(),primary_key=True)
@@ -50,7 +50,7 @@ class Http_url(db.Model):
     username = db.Column(db.String(300))
     status = db.Column(db.Boolean(),nullable=False,default=True)
     def __repr__(self):
-        return f"API(ID={self.metric_id},URL={self.url}, period={self.period},status={self.status})"  
+        return f"API(ID={self.metric_id},URL={self.url}, period={self.period},status={self.status}, args={self.args})"  
     
 class Token_url(db.Model):
     metric_id = db.Column(db.Integer(),primary_key=True)
@@ -73,7 +73,7 @@ db.create_all()
 class Query:
     # return basic url's
     def get_basic_args(val):
-        return Basic_url.query(Basic_url.args).filter(Basic_url.metric_id==val)
+        return db.session.query(Basic_url.args,Basic_url.metric_id).filter(Basic_url.url==val,Basic_url.status==True).all()
     def get_basics():
         return Basic_url.query.all()
     def check_basics_id(val):
@@ -93,12 +93,12 @@ class Query:
         Basic_url.query.filter(Basic_url.metric_id == val).delete()
         db.session.commit()
     def get_basic_period(freq):
-        # return Basic_url.query.distinct(Basic_url.url)...
-        return db.session.query(Basic_url.url.distinct(),Basic_url.metric_id).filter(Basic_url.status==True,Basic_url.period==freq).all()
+        #return Basic_url.query.distinct(Basic_url.url).filter(Basic_url.status==True,Basic_url.period==freq).all()
+        return db.session.query(Basic_url.url.distinct()).filter(Basic_url.status==True,Basic_url.period==freq).all()
     
     # return url's with keys
     def get_key_args(val):
-        return Key_url.query(Key_url.args).filter(Key_url.metric_id==val)
+        return db.session.query(Key_url.args,Key_url.metric_id).filter(Key_url.url==val,Key_url.status==True).all()
     def get_keys():
         return Key_url.query.all()
     def check_keys_id(val):
@@ -120,11 +120,11 @@ class Query:
     # só com status=True
     def get_key_period(freq):
         return Key_url.query.filter(Key_url.status==True,Key_url.period==freq).all()
+    def get_key_period_distinct(freq):
+        return db.session.query(Key_url.url.distinct(),Key_url.key).filter(Key_url.status==True,Key_url.period==freq).all()
     
-    def get_http_distinct_url():
-        return
     def get_http_args(val):
-        return Http_url.query(Http_url.args).filter(Http_url.metric_id==val)
+        return db.session.query(Http_url.args,Http_url.metric_id).filter(Http_url.url==val,Http_url.status==True).all()
     def get_https():
         return Http_url.query.all()
     def check_http_id(val):
@@ -146,10 +146,12 @@ class Query:
     # só com status=True
     def get_http_period(freq):
         return Http_url.query.filter(Http_url.status==True,Http_url.period==freq).all()
+    def get_http_period_distinct(freq):
+        return db.session.query(Http_url.url.distinct(),Http_url.username,Http_url.key).filter(Http_url.status==True,Http_url.period==freq).all()
 
 
     def get_token_args(val):
-        return db.session.query(Token_url.args).filter(Token_url.metric_id==val)
+        return db.session.query(Token_url.args,Token_url.metric_id).filter(Token_url.url==val,Token_url.status==True).all()
     def get_tokens():
         return Token_url.query.all()
     def check_token_id(val):
@@ -166,11 +168,40 @@ class Query:
     def remove_token(val):
         Token_url.query.filter(Token_url.metric_id == val).delete()
         db.session.commit()    
+    def get_token_period_distinct(freq):
+        return db.session.query(Token_url.url.distinct(),Token_url.token_url,Token_url.auth_type,Token_url.content_type,Token_url.secret,Token_url.key).filter(Token_url.status==True,Token_url.period==freq).all()
     def get_token_period(freq):
         return Token_url.query.filter(Token_url.status==True,Token_url.period==freq).all()
 
-print(Query.get_token_args('https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='))
+print('\n')
+print('\n')
+print('basic period 5')
 print(Query.get_basic_period(5))
+print('basic args')
+print(Query.get_basic_args("http://services.web.ua.pt/parques/parques"))
+print('\n')
+print('\n')
+print('\n')
+print('key period 5')
+print(Query.get_key_period(5))
+print('key args')
+print(Query.get_key_args("http://services.web.ua.pt/parques/parques"))
+print('\n')
+print('\n')
+print('\n')
+print('http period 5')
+print(Query.get_http_period(5))
+print('http args')
+print(Query.get_http_args("http://services.web.ua.pt/parques/parques"))
+print('\n')
+print('\n')
+print('\n')
+print('token_freq 5')
+print(Query.get_token_period(5))
+print('token_args')
+print(Query.get_token_args('https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='))
+print('\n')
+print('\n')
 
 #   AUTHENTICATION TOKEN
 app.config['SECRET_KEY'] = 'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'

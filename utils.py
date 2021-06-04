@@ -11,56 +11,33 @@ from pytz import timezone, common_timezones
 from datetime import datetime
 from make_requests import influx
 
-class TimeoutException(Exception):   # Custom exception class
-    pass
 
-def timeout_handler(signum, frame):   # Custom signal handler
-    raise TimeoutException
 
-signal.signal(signal.SIGALRM, timeout_handler)
-
-def make_request(url):
-    signal.alarm(60) 
-    try:
-        r = requests.get(url)
-        if r.status_code == 200:
-            return r.json()
-        return display_error(r.status_code)
-    except TimeoutException:
-        return False
+def make_request(url):  
+    r = requests.get(url,timeout=15)
+    if r.status_code == 200:
+        return r.json()
+    return display_error(r.status_code)
         
 
 def make_request_key(url,key):
-    signal.alarm(60) 
-    try:
-        return requests.get(url,headers={'Authorization': key})
-    except TimeoutException:
-        return False
+    return requests.get(url,headers={'Authorization': key},timeout=15)
+   
 def make_request_http(url,user,key):
-    signal.alarm(60) 
-    try:
-        return requests.get(url,headers={"userName": user , "password": key})
-    except TimeoutException:
-        return False   
+    return requests.get(url,headers={"userName": user , "password": key},timeout=15)
+
 def make_request_token(url,token):
-    signal.alarm(60) 
-    try:
-        return requests.get(url,headers={'Authorization': token})
-    except TimeoutException:
-        return False 
+    return requests.get(url,headers={'Authorization': token},timeout=15)
+    
 
 # para o wso2 content_type -> application/x-www-form-urlencoded | auth_type -> Bearer
 def get_token(url,key,secret,content_type=None,auth_type=None):
-    signal.alarm(60) 
-    try:
-        msg = encode_b64(key+':'+secret)
-        #print(msg=='al9tR25keEsyV0xLRVVLYkdya1g3bjF1eEFFYTpCcnN6SDhvRjlRc0hSamlPQUMxRDlaZTBJbG9h')
-        request_token = requests.post(url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg})
-        if request_token.status_code < 400:
-            return auth_type + ' ' + request_token.json()['access_token'] if auth_type else request_token.json()
-        return False
-    except TimeoutException:
-        return False 
+    msg = encode_b64(key+':'+secret)
+    #print(msg=='al9tR25keEsyV0xLRVVLYkdya1g3bjF1eEFFYTpCcnN6SDhvRjlRc0hSamlPQUMxRDlaZTBJbG9h')
+    request_token = requests.post(url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
+    if request_token.status_code < 400:
+        return auth_type + ' ' + request_token.json()['access_token'] if auth_type else request_token.json()
+    return False
     
 def send_influx():
     pass
