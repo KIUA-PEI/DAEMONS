@@ -6,7 +6,6 @@ import requests
 import json
 import base64
 import pytz
-import signal 
 from pytz import timezone, common_timezones
 from datetime import datetime
 from make_requests import influx
@@ -102,6 +101,55 @@ def filter_request(vals,args):
                 vals.remove(val)
     return vals
 #clientCount by location ... tem que estar tudo no mesmo field
+def merge_entrys(entry,data):
+    
+    for val in [val for val in data]:
+        if isinstance(entry,dict):
+            for key in entry:
+                if not isinstance(entry[key],str) and isinstance(entry[key],list):
+                    for v in entry[key]:
+                        val[key] = v
+                else:    
+                    val[key] = entry[key]
+        if isinstance(entry,list):
+            aux = val
+            data.remove(val)
+            for row in entry:
+                if isinstance(row,dict):
+                    aux.update(aux)
+                    data.append(row)
+            
+    return data
+
+def merge_filter(data,args):
+    entrys = []
+    for field in [field for field in data]:   
+        if isinstance(field,str):          
+            if isinstance(data[field],dict):
+                entrys=merge_entrys(merge_filter(data[field],args),entrys)
+            elif not isinstance(data[field],str) and isinstance(data[field],list): 
+                aux = []
+                for val in data[field]:
+                    print('val',val)
+                    aux+=merge_entrys((merge_filter(val,args)),entrys)
+                for val in aux:
+                    print('aux_val',val)
+                entrys = aux
+            elif field in args:
+                if entrys:
+                    entrys=merge_entrys({field:data[field]},entrys)
+                else:
+                    entrys.append({field:data[field]})
+        elif isinstance(field,dict):
+            for val in merge_filter(field,args):
+                entrys.append(val)
+        elif isinstance(field,list):
+            for aux in field:
+                for val in merge_filter(aux,args):
+                    entrys.append(val)
+    
+    return entrys
+
 def send_influx(data,args):
     for field in [field for field in data]:    
         if isinstance(field,str):
@@ -128,10 +176,7 @@ def send_influx(data,args):
             send_influx(field,args)
         if isinstance(field,list):
             send_influx(field,args)
-                
-def get_timestamp():
-    portugal_tz = timezone("Europe/Lisbon")
-    return portugal_tz.localize(datetime.now()).isoformat()       
+                 
             
 # gramatica ... clientCount, location and macAddress
 # 
