@@ -1,21 +1,21 @@
 #from DAEMONS.Api.utils import make_request
 import time
-import json
-import requests
+#import json
+#import requests
 
 from datetime import datetime
 from influxdb import InfluxDBClient
 from apscheduler.schedulers.background import BackgroundScheduler
-from sqlalchemy import create_engine
+#from sqlalchemy import create_engine
 from api_daemon import Query
 from make_requests_utils import *
-import signal
+#import signal
 
 
-from functools import wraps
-import errno
-import os
-import signal
+#from functools import wraps
+#import errno
+#import os
+#import signal
 """
 class TimeoutError(Exception):
     pass
@@ -58,13 +58,13 @@ influx = None
     #influx = InfluxDBClient(host='127.0.0.1', port=8086, username="daemon", password="daemon_1234")
 #except:
 #   print('influx down')
-class TimeoutException(Exception):   # Custom exception class
-    pass
+#class TimeoutException(Exception):   # Custom exception class
+#    pass
 
-def timeout_handler(signum, frame):   # Custom signal handler
-    raise TimeoutException
+#def timeout_handler(signum, frame):   # Custom signal handler
+#    raise TimeoutException
 
-signal.signal(signal.SIGALRM, timeout_handler)
+#signal.signal(signal.SIGALRM, timeout_handler)
 
 
 
@@ -86,47 +86,28 @@ def make_request(period):
         print('basic')
         print(val[0])
         print('\n')
-        signal.alarm(60) 
-        try:
-        
-            request_basic(val[0])
-        except TimeoutException:
-            print('TIME EXCEPTION')
-            pass
+        request_basic(val[0])
         
     
     for val in Query.get_key_period(period): 
         print('key')
         print(val)
         print('\n')
-        signal.alarm(60) 
-        try:
-            request_key(val)
-        except TimeoutException:
-            print('TIME EXCEPTION')
-            pass
+        request_key(val)
+        
         
     for val in Query.get_http_period(period):
         print('http')
         print(val)
         print('\n')
-        signal.alarm(60) 
-        try:
-            request_http(val)
-        except TimeoutException:
-            print('TIME EXCEPTION')
-            pass
+        request_http(val)
+        
             
     for val in Query.get_token_period(period):
         print('token')
         print(val)
         print('\n')
-        signal.alarm(60) 
-        try:
-            request_token(val)
-        except TimeoutException:
-            print('TIME EXCEPTION')
-            pass
+        request_token(val)
      
 
 def main():

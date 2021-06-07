@@ -130,10 +130,9 @@ def merge_filter(data,args):
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
                 for val in data[field]:
-                    print('val',val)
                     aux+=merge_entrys((merge_filter(val,args)),entrys)
-                for val in aux:
-                    print('aux_val',val)
+                #for val in aux:
+                #    print('aux_val',val)
                 entrys = aux
             elif field in args:
                 if entrys:

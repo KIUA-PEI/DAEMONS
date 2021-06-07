@@ -4,6 +4,8 @@ from make_requests import *
 
 tokens = {}
 
+# se calhar caso não tenha args usar merge_filter(vals,vals.keys) -> tudo
+
 def request_basic(url):
     print('STARTING BASIC\n')
     print(url)
@@ -14,7 +16,8 @@ def request_basic(url):
             if val[0]:
                 args = [arg.strip() for arg in val[0].split(',')]
                 try:
-                    merge_filter(request.json(),args)
+                    db_entrys = merge_filter(request.json(),args)
+                    # enviar para a influx
                 except:
                     Query.pause_basic(val[1])
                     Query.change_basic(val[1],'error','BAD FORMAT')
@@ -33,12 +36,13 @@ def request_key(val):
     if request.status_code < 400:
         if val.args:
             args = [arg.strip() for arg in val.args.split(',')]
-            # filter
             try:
-                merge_filter(request.json(),args)
+                db_entrys = merge_filter(request.json(),args)
+                # enviar para a influx
             except:
                 Query.pause_key(val.metric_id)
                 print("FILTER FAILED")
+                return False
         else:
             print('SEND TO INFLUX')       
     else:
@@ -52,7 +56,8 @@ def request_http(val):
         if val.args:
             args = [arg.strip() for arg in val.args.split(',')]
             try:
-                merge_filter(request.json(),args)
+                db_entrys = merge_filter(request.json(),args)
+                # enviar para a influx
             except:
                 Query.pause_http(val.metric_id)
                 print("FILTER FAILED")     
@@ -79,21 +84,19 @@ def request_token(val):
    
     while check < 4:
         request = requests.get(val.url,headers={'Authorization': tokens[val.url]},timeout=25)
-        # se der erro pedir token
         if request.status_code<=200:
             if val.args:
                 args = [arg.strip() for arg in val.args.split(',')]
                 try:
-                    db_entrys=merge_filter(request.json(),args)
-                    #print('db_entrys',db_entrys)
-                    #for entry in db_entrys:
-                    #    print('db_entry',entry)
+                    db_entrys = merge_filter(request.json(),args)
+                    # enviar para a influx
+                    
                 except:
                     Query.pause_token(val.metric_id)
                     print("FILTER FAILED") 
+                    return False
             else:
                 print('SEND TO INFLUX')
-            return
         elif request.status_code == 401:
             tokens[val.url] = get_token(val.token_url,val.key,val.secret,val.content_type,val.auth_type)
         elif request.status_code == 403:
@@ -117,6 +120,4 @@ def request_token(val):
     else:
         Query.pause_token(val.metric_id)
     """
-    Query.pause_token(val.metric_id)
-    print("REQUEST FAILED")
     return False
