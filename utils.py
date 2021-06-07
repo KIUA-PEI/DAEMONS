@@ -80,8 +80,8 @@ def merge_entrys(entrys,data):
             entrys.remove(row)
 
         for row in entrys:
-            aux.update(row)
-            merge_result.append(aux)
+            row.update(aux)
+            merge_result.append(row)
 
     return merge_result
 
@@ -91,7 +91,10 @@ def merge_filter(data,args):
         if isinstance(field,str):          
             
             if isinstance(data[field],dict):
-                entrys=merge_entrys(merge_filter(data[field],args),entrys)
+                if entrys:
+                    entrys+=merge_entrys(merge_filter(data[field],args),entrys)
+                else:
+                    entrys=merge_entrys(merge_filter(data[field],args),entrys)
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
                 for val in data[field]:
