@@ -8,28 +8,29 @@ tokens = {}
 
 def request_basic(url):
     print('STARTING BASIC\n')
-    print(url)
     request = requests.get(url,timeout=25)
     if request.status_code == 200: 
         # val[0] -> args ,val[1] -> id 
         print(request.json())
         print('query_args',Query.get_basic_args(url))
+        print(len(Query.get_basic_args(url)))
         for val in Query.get_basic_args(url):
             print('basic',url,val)
             args = [arg.strip() for arg in val[0].split(',')] if val[0] else 1
             print('args',args)
-            try:
+            
+            if True:
                 db_entrys = merge_filter(request.json(),args)
-                print('DONE',db_entrys)
+                    #print('DONE',db_entrys)
                 if 'Timestamp' in request.json():
                     print('Insert Time Stamp')
                 for entry in db_entrys:
                     print(entry,url)
-                #        # enviar para a influx
-                return db_entrys
-            except:
-                Query.pause_basic(val[1])
-                print("FILTER FAILED")             
+                # enviar para a influx
+            #except:
+            #    Query.pause_basic(val[1])
+            #    print("FILTER FAILED")        
+
     elif request.status_code == 401:
         Query.pause_basic_url(val[1])
         print('Authentication Error')

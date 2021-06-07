@@ -71,22 +71,25 @@ def create_entry(measurement, tags, timestamp, fields):
 
 #clientCount by location ... tem que estar tudo no mesmo field
 def merge_entrys(entrys,data):
-    merge_result = []
-    
+    merge_result = [] 
     for val in [val for val in data]:
         aux = val
+
         for row in [row for row in entrys if row.keys() == val.keys()]:
             merge_result.append(row)
             entrys.remove(row)
+
         for row in entrys:
             aux.update(row)
             merge_result.append(aux)
+
     return merge_result
 
 def merge_filter(data,args):
     entrys = []
     for field in [field for field in data]:
         if isinstance(field,str):          
+            
             if isinstance(data[field],dict):
                 entrys=merge_entrys(merge_filter(data[field],args),entrys)
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
@@ -96,7 +99,7 @@ def merge_filter(data,args):
                 entrys = aux
             elif args == 1:
                 if entrys:
-                    entrys=merge_entrys({field:data[field]},entrys)
+                    entrys=merge_entrys([{field:data[field]}],entrys)
                 else:
                     entrys.append({field:data[field]})
             elif field in args:
@@ -104,11 +107,13 @@ def merge_filter(data,args):
                     entrys=merge_entrys([{field:data[field]}],entrys)
                 else:
                     entrys.append({field:data[field]})
+        
         elif isinstance(field,dict):
             if entrys:
                 entrys += merge_entrys((merge_filter(field,args)),entrys) if entrys else merge_filter(field,args)
             else:
                 entrys = merge_filter(field,args)
+        
         elif isinstance(field,list):
             aux = []
             for val in field:
