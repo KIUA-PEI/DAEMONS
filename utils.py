@@ -116,9 +116,9 @@ def merge_entrys(entry,data):
             data.remove(val)
             for row in entry:
                 if isinstance(row,dict):
-                    aux.update(aux)
-                    data.append(row)
-            
+                    aux.update(row)
+                    data.append(aux)
+    #print(data)
     return data
 
 def merge_filter(data,args):
@@ -129,8 +129,11 @@ def merge_filter(data,args):
                 entrys=merge_entrys(merge_filter(data[field],args),entrys)
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
+                #print('\n')
+                #print('before',entrys)
+                #print('\n')
                 for val in data[field]:
-                    aux+=merge_entrys((merge_filter(val,args)),entrys)
+                    aux += merge_entrys((merge_filter(val,args)),entrys) if entrys else merge_filter(val,args)
                 #for val in aux:
                 #    print('aux_val',val)
                 entrys = aux
@@ -146,7 +149,7 @@ def merge_filter(data,args):
             for aux in field:
                 for val in merge_filter(aux,args):
                     entrys.append(val)
-    
+    #print(entrys)
     return entrys
 
 def send_influx(data,args):

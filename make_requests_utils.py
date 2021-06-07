@@ -13,6 +13,7 @@ def request_basic(url):
     if request.status_code < 400: 
         # val[0] -> args ,val[1] -> id 
         for val in Query.get_basic_args(url):
+            print(val)
             if val[0]:
                 args = [arg.strip() for arg in val[0].split(',')]
                 try:
@@ -25,6 +26,8 @@ def request_basic(url):
                     return False
             else:  
                 print('Send 2 influx')
+                if 'Timestamp' in request.json():
+                    print('Insert Time Stamp')
     else:
         Query.pause_basic_url(url)
     return False
@@ -34,8 +37,7 @@ def request_key(val):
     
     request = requests.get(val.url,headers={'Authorization': val.key},timeout=25)
     if request.status_code < 400:
-        if val.args:
-            args = [arg.strip() for arg in val.args.split(',')]
+            args = [arg.strip() for arg in val.args.split(',')] if val.args else request.json().keys()
             try:
                 db_entrys = merge_filter(request.json(),args)
                 # enviar para a influx
@@ -43,8 +45,6 @@ def request_key(val):
                 Query.pause_key(val.metric_id)
                 print("FILTER FAILED")
                 return False
-        else:
-            print('SEND TO INFLUX')       
     else:
         Query.pause_key(val.metric_id)
     return False
@@ -87,10 +87,14 @@ def request_token(val):
         if request.status_code<=200:
             if val.args:
                 args = [arg.strip() for arg in val.args.split(',')]
+                print(args)
                 try:
                     db_entrys = merge_filter(request.json(),args)
                     # enviar para a influx
-                    
+                    #print(db_entrys)
+                    for entry in db_entrys:
+                        print(entry)
+                    return db_entrys
                 except:
                     Query.pause_token(val.metric_id)
                     print("FILTER FAILED") 

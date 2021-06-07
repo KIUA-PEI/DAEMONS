@@ -173,6 +173,8 @@ class Query:
     def get_token_period(freq):
         return Token_url.query.filter(Token_url.status==True,Token_url.period==freq).all()
 
+
+
 print('\n')
 print('\n')
 print('basic period 5')
@@ -203,7 +205,7 @@ print(Query.get_token_args('https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/A
 print('\n')
 print('\n')
 
-#   AUTHENTICATION TOKEN
+#   AUTHENTICATION KEY
 app.config['SECRET_KEY'] = 'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'
 @app.route('/login', methods=['GET'])
 def login():
