@@ -10,26 +10,38 @@ def request_basic(url):
     print('STARTING BASIC\n')
     print(url)
     request = requests.get(url,timeout=25)
-    if request.status_code < 400: 
+    if request.status_code == 200: 
         # val[0] -> args ,val[1] -> id 
+        print(request.json())
+        print('query_args',Query.get_basic_args(url))
         for val in Query.get_basic_args(url):
-            print(val)
-            if val[0]:
-                args = [arg.strip() for arg in val[0].split(',')]
-                try:
-                    db_entrys = merge_filter(request.json(),args)
-                    # enviar para a influx
-                except:
-                    Query.pause_basic(val[1])
-                    Query.change_basic(val[1],'error','BAD FORMAT')
-                    print("FILTER FAILED")
-                    return False
-            else:  
-                print('Send 2 influx')
+            print('basic',url,val)
+            args = [arg.strip() for arg in val[0].split(',')] if val[0] else 1
+            print('args',args)
+            try:
+                db_entrys = merge_filter(request.json(),args)
+                print('DONE',db_entrys)
                 if 'Timestamp' in request.json():
                     print('Insert Time Stamp')
+                for entry in db_entrys:
+                    print(entry,url)
+                #        # enviar para a influx
+                return db_entrys
+            except:
+                Query.pause_basic(val[1])
+                print("FILTER FAILED")             
+    elif request.status_code == 401:
+        Query.pause_basic_url(val[1])
+        print('Authentication Error')
+    elif request.status_code == 403:
+        Query.pause_basic_url(val[1])
+        print("URL FORBIDEN OPERATION")
+    elif request.status_code == 404:
+        Query.pause_basic_url(val[1])
+        print('URL NOT FOUND')
     else:
-        Query.pause_basic_url(url)
+        print('bad request')
+        Query.pause_basic_url(val[1])
     return False
 
 def request_key(val):       
@@ -38,15 +50,29 @@ def request_key(val):
     request = requests.get(val.url,headers={'Authorization': val.key},timeout=25)
     if request.status_code < 400:
             args = [arg.strip() for arg in val.args.split(',')] if val.args else request.json().keys()
+            print('key',val.url,args)
             try:
                 db_entrys = merge_filter(request.json(),args)
+                for entry in db_entrys:
+                    print(entry,val.url)
                 # enviar para a influx
             except:
                 Query.pause_key(val.metric_id)
                 print("FILTER FAILED")
                 return False
-    else:
+    elif request.status_code == 401:
         Query.pause_key(val.metric_id)
+        print('Authentication Error')
+    elif request.status_code == 403:
+        Query.pause_key(val.metric_id)
+        print("URL FORBIDEN OPERATION")
+    elif request.status_code == 404:
+        Query.pause_key(val.metric_id)
+        print('URL NOT FOUND')
+    else:
+        print('bad request')
+        Query.pause_key(val.metric_id)
+        
     return False
 
 def request_http(val):  
@@ -55,16 +81,30 @@ def request_http(val):
     if request.status_code < 400:    
         if val.args:
             args = [arg.strip() for arg in val.args.split(',')]
+            print('http',val.url,args)
             try:
                 db_entrys = merge_filter(request.json(),args)
                 # enviar para a influx
+                for entry in db_entrys:
+                    print(entry,val.url)
             except:
                 Query.pause_http(val.metric_id)
                 print("FILTER FAILED")     
         else:
             print('SEND TO INFLUX')   
-    else:
+    elif request.status_code == 401:
         Query.pause_http(val.metric_id)
+        print('Authentication Error')
+    elif request.status_code == 403:
+        Query.pause_http(val.metric_id)
+        print("URL FORBIDEN OPERATION")
+    elif request.status_code == 404:
+        Query.pause_http(val.metric_id)
+        print('URL NOT FOUND')
+    else:
+        print('bad request')
+        Query.pause_http(val.metric_id)
+        
     return False
         
 def request_token(val):
@@ -102,9 +142,17 @@ def request_token(val):
             else:
                 print('SEND TO INFLUX')
         elif request.status_code == 401:
-            tokens[val.url] = get_token(val.token_url,val.key,val.secret,val.content_type,val.auth_type)
+            Query.pause_token(val.metric_id)
+            print('Authentication Error')
         elif request.status_code == 403:
-            print("TOKEN REQUEST FORBIDDEN")
+            Query.pause_token(val.metric_id)
+            print("URL FORBIDEN OPERATION")
+        elif request.status_code == 404:
+            Query.pause_token(val.metric_id)
+            print('URL NOT FOUND')
+        elif request.status_code < 500:
+            print('bad request')
+            Query.pause_token(val.metric_id)
         else:
             check += 1
         

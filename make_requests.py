@@ -102,13 +102,13 @@ def make_request(period):
         print('\n')
         request_http(val)
         
-            
+      
     for val in Query.get_token_period(period):
         print('token')
         print(val)
         print('\n')
         request_token(val)
-     
+    
 
 def main():
     print('STARTING ...')
@@ -163,10 +163,10 @@ def main():
                 time.sleep(2)
         except (KeyboardInterrupt, SystemExit):
             print("\nexiting...\n")
+            scheduler.remove_job('5minjob_basic')
             scheduler.remove_job('15minjob_basic')
-            scheduler.remove_job('15minjob_key')
-            scheduler.remove_job('15minjob_http')
-            scheduler.remove_job('15minjob_token')
+            scheduler.remove_job('30minjob_basic')
+            scheduler.remove_job('dailyjob_basic')
             scheduler.shutdown()
             scheduler.shutdown()
     #except:

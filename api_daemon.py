@@ -349,7 +349,7 @@ def api_pause_key():
     if not 'id' in request.args.keys():
         return 'Missing [id] Argument',400
     if not Query.check_keys_id(request.args['id']):
-        return "Missing [id] Argument",400
+        return "Missing [id] Argument",403
     
     Query.change_key(request.args['id'],"status",False)
     return "DAEMON PAUSED",201
@@ -527,7 +527,7 @@ def api_pause_token():
     if not Query.check_token_id(request.args['id']):
         return "DAEMON ID NOT FOUND",403
     
-    Query.change_token(request.args['id'],"status",True)
+    Query.change_token(request.args['id'],"status",False)
     return "DAEMON PAUSED",201
 
 @app.route('/Daemon/Start/Token',methods=['GET'])

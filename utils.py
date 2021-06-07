@@ -68,118 +68,55 @@ def create_entry(measurement, tags, timestamp, fields):
     """
     return [{"measurement": measurement, "tags" : tags, "time" : timestamp, "fields": fields}]
 
-# só pode receber certos tipos de dados ...
-def filter_request(vals,args):
-    if not isinstance(vals, str):
-        for field in [field for field in vals]:
-            if isinstance(field,str):
-                if (isinstance(vals[field],list) or isinstance(vals[field],set)):
-                    i=0
-                    for v in vals[field]:
-                        vals[field][i] = filter_request(v,args)  
-                        i+=1
-                    continue
-                if isinstance(vals[field],dict):
-                    aux = list(vals[field].keys())
-                    for key in aux:
-                        if not key in args:
-                            del vals[field][key]
-                    continue
-                if not field in args:
-                    del vals[field]
-                continue  
-            if isinstance(field,dict):
-                filter_request(field,args)
-                continue 
-            if isinstance(field,list):
-                for v in field:
-                    filter_request(v,args) 
-                continue
-            return []
-        for val in vals:
-            if not val:
-                vals.remove(val)
-    return vals
+
 #clientCount by location ... tem que estar tudo no mesmo field
-def merge_entrys(entry,data):
+def merge_entrys(entrys,data):
+    merge_result = []
     
     for val in [val for val in data]:
-        if isinstance(entry,dict):
-            for key in entry:
-                if not isinstance(entry[key],str) and isinstance(entry[key],list):
-                    for v in entry[key]:
-                        val[key] = v
-                else:    
-                    val[key] = entry[key]
-        if isinstance(entry,list):
-            aux = val
-            data.remove(val)
-            for row in entry:
-                if isinstance(row,dict):
-                    aux.update(row)
-                    data.append(aux)
-    #print(data)
-    return data
+        aux = val
+        for row in [row for row in entrys if row.keys() == val.keys()]:
+            merge_result.append(row)
+            entrys.remove(row)
+        for row in entrys:
+            aux.update(row)
+            merge_result.append(aux)
+    return merge_result
 
 def merge_filter(data,args):
     entrys = []
-    for field in [field for field in data]:   
+    for field in [field for field in data]:
         if isinstance(field,str):          
             if isinstance(data[field],dict):
                 entrys=merge_entrys(merge_filter(data[field],args),entrys)
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
-                #print('\n')
-                #print('before',entrys)
-                #print('\n')
                 for val in data[field]:
                     aux += merge_entrys((merge_filter(val,args)),entrys) if entrys else merge_filter(val,args)
-                #for val in aux:
-                #    print('aux_val',val)
                 entrys = aux
-            elif field in args:
+            elif args == 1:
                 if entrys:
                     entrys=merge_entrys({field:data[field]},entrys)
                 else:
                     entrys.append({field:data[field]})
+            elif field in args:
+                if entrys:
+                    entrys=merge_entrys([{field:data[field]}],entrys)
+                else:
+                    entrys.append({field:data[field]})
         elif isinstance(field,dict):
-            for val in merge_filter(field,args):
-                entrys.append(val)
+            if entrys:
+                entrys += merge_entrys((merge_filter(field,args)),entrys) if entrys else merge_filter(field,args)
+            else:
+                entrys = merge_filter(field,args)
         elif isinstance(field,list):
-            for aux in field:
-                for val in merge_filter(aux,args):
-                    entrys.append(val)
-    #print(entrys)
+            aux = []
+            for val in field:
+                aux += merge_entrys((merge_filter(val,args)),entrys) if entrys else merge_filter(val,args)
+            entrys = aux
     return entrys
 
-def send_influx(data,args):
-    for field in [field for field in data]:    
-        if isinstance(field,str):
-            if field == args[0]:
-                result = [{"measurment":"table_name","Timestamp" : str(get_timestamp())}, data[field]]
-                for val in data:
-                    if val in args[1:]:
-                        print(field)
-                        result.append(data[val])
-                print('SEND TO INFLUX: ')
-                print(result)  
-                if influx:
-                    try:
-                        #[{"measurement": measurement, "tags" : tags, "time" : timestamp, "fields": fields}]
-                        influx.write_points(json.dumps(result), database="Metrics")       
-                    except:
-                        print('INFLUX DOWN')    
-                pass
-            elif isinstance(data[field],dict):
-                send_influx(data[field],args)    
-            elif not isinstance(data[field],str) and isinstance(data[field],list):
-                send_influx(data[field],args)    
-        if isinstance(field,dict):
-            send_influx(field,args)
-        if isinstance(field,list):
-            send_influx(field,args)
-                 
-            
+
 # gramatica ... clientCount, location and macAddress
 # 
 """
