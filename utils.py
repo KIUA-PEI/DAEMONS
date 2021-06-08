@@ -168,7 +168,7 @@ def merge_entrys(entrys,data):
             entrys.remove(row)
 
     return merge_result
-"""
+
 def merge_entrys(entrys,data):
 
     for row in [row for row in entrys if row.keys() == data[0].keys()]:
@@ -184,7 +184,16 @@ def merge_entrys(entrys,data):
         data.append(entry)
     
     return data
-"""
+
+def merge_fields(field,data):
+    #print(field)
+    #print(data)
+    for row in field:
+        for val in data:
+            val.update(row)
+    
+    return data
+    
 
 def merge_filter(data,args):
     entrys = []
@@ -203,18 +212,18 @@ def merge_filter(data,args):
                 entrys = aux
             elif args == 1:
                 if entrys:
-                    entrys=merge_entrys([{field:data[field]}],entrys)
+                    entrys=merge_fields([{field:data[field]}],entrys)
                 else:
                     entrys.append({field:data[field]})
             elif field in args:
                 if entrys:
-                    entrys=merge_entrys([{field:data[field]}],entrys)
+                    entrys=merge_fields([{field:data[field]}],entrys)
                 else:
                     entrys.append({field:data[field]})
         
         elif isinstance(field,dict):
             if entrys:
-                entrys += merge_entrys((merge_filter(field,args)),entrys) if entrys else merge_filter(field,args)
+                entrys = merge_entrys((merge_filter(field,args)),entrys) if entrys else merge_filter(field,args)
             else:
                 entrys = merge_filter(field,args)
         
