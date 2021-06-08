@@ -153,6 +153,7 @@ def merge_entrys3(entrys,data):
 
     return data 
 """
+
 def merge_entrys(entrys,data):
     merge_result = [] 
     for val in [val for val in data]:
@@ -169,18 +170,20 @@ def merge_entrys(entrys,data):
     return merge_result
 """
 def merge_entrys(entrys,data):
-    check = False 
 
     for row in [row for row in entrys if row.keys() == data[0].keys()]:
         data.append(row)
         entrys.remove(row)
-        check = True
+        
+    merge_data = {}
+    for key in data[0]:
+        merge_data[key] = data[0][key]
     
-    if check:
-        return data 
-
+    for entry in entrys:
+        entry.update(merge_data)
+        data.append(entry)
     
-    return 
+    return data
 """
 
 def merge_filter(data,args):

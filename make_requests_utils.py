@@ -36,6 +36,8 @@ def request_basic(url):
             args = [arg.strip() for arg in val[0].split(',')] if val[0] else 1
             try:
                 db_entrys = format_influx(val[1],merge_filter(request.json(),args))
+                #for entry in db_entrys:
+                #    print(entry['fields'])
                 if db_entrys:
                     try:
                         influx.write_points(db_entrys, database="Test")
@@ -153,8 +155,10 @@ def request_token(val):
         if request.status_code<=200:
             args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
             try:
-                db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args+['first']))
+                db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
                 if db_entrys:
+                    #for entry in db_entrys:
+                    #    print(entry['fields'])
                     try:
                         influx.write_points(db_entrys, database="Test")
                     except:
