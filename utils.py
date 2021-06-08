@@ -70,20 +70,118 @@ def create_entry(measurement, tags, timestamp, fields):
 
 
 #clientCount by location ... tem que estar tudo no mesmo field
+def merge_entrys2(entrys,data):
+    for row in [row for row in data]:
+        for entry in entrys:
+            for key in [key for key in entry if not key in row]:
+                row[key] = entry[key]
+            for key in [key for key in row if not key in entry]:
+                entry[key] = row[key]
+            data.append(entry)
+    print('finaly')
+    return data
+"""
+def merge_entrys(entrys,data):
+    merge_result = [] 
+    merge_data = {}
+
+    for row in entrys:
+        merge_row = {}
+        if row.keys() != data[0].keys():
+            for key in row:
+                if not key in data[0].keys():
+                    merge_data[key] = row[key]
+                else:
+                    merge_row[key] = data[0][key]
+        for key in merge_row:
+            row[key] = merge_row[key]
+        print(row)
+        data.append(row)
+
+    for val in data:
+        for key in merge_data:
+            val[key] = merge_data[key]
+
+            
+    for val in [val for val in data]:
+        aux = val
+        for row in entrys:
+            #entrys.remove(row)
+            #data.remove(val)
+            if row.keys() != val.keys():
+                
+                #print('aux',aux)
+                #print('val',val)
+                for key in row:
+                    if not key in val:
+                        #print(val,key)
+                        val[key] = row[key]
+                #val.update(row)
+                for key in val:
+                    if not key in row:
+                        row[key] = val[key]
+            #if row.keys() == val.keys():
+            #data.append(row)    
+            #data.append(aux)
+            data.append(row)
+        data.append(aux)
+        break
+                
+            #merge_result.append(row)
+         
+
+
+    #for row in entrys:
+    #    print('ASDASDASD')
+    #    data.append(row)
+
+    return data
+    
+
+def merge_entrys3(entrys,data):
+    for val in data:
+        print('mmmmmmmmmmh')
+        for entry in entrys:
+            for key in val:
+                if not key in entry:
+                    entry[key] = val[key]
+            for key in entry:
+                if not key in val:
+                    val[key] = entry[key]
+    
+            data.append(entry)
+
+    return data 
+"""
 def merge_entrys(entrys,data):
     merge_result = [] 
     for val in [val for val in data]:
-        aux = val
 
         for row in [row for row in entrys if row.keys() == val.keys()]:
             merge_result.append(row)
             entrys.remove(row)
 
         for row in entrys:
-            row.update(aux)
+            row.update(val)
             merge_result.append(row)
+            entrys.remove(row)
 
     return merge_result
+"""
+def merge_entrys(entrys,data):
+    check = False 
+
+    for row in [row for row in entrys if row.keys() == data[0].keys()]:
+        data.append(row)
+        entrys.remove(row)
+        check = True
+    
+    if check:
+        return data 
+
+    
+    return 
+"""
 
 def merge_filter(data,args):
     entrys = []

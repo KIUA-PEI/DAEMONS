@@ -53,7 +53,8 @@ def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
         args[i]=args[i].strip()
 """
 
-influx = None
+influx = InfluxDBClient(host='40.68.96.164', port=8086, username="peikpis", password="peikpis_2021")
+
 #try:
     #influx = InfluxDBClient(host='127.0.0.1', port=8086, username="daemon", password="daemon_1234")
 #except:
@@ -101,15 +102,15 @@ def make_request(period):
         print(val)
         print('\n')
         request_http(val)
-        
+    
       
     for val in Query.get_token_period(period):
         print('token')
         print(val)
         print('\n')
         request_token(val)
+     
     
-
 def main():
     print('STARTING ...')
     print('_____________________________________________________')
