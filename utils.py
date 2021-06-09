@@ -32,7 +32,6 @@ def make_request_token(url,token):
 # para o wso2 content_type -> application/x-www-form-urlencoded | auth_type -> Bearer
 def get_token(url,key,secret,content_type=None,auth_type=None):
     msg = encode_b64(key+':'+secret)
-    #print(msg=='al9tR25keEsyV0xLRVVLYkdya1g3bjF1eEFFYTpCcnN6SDhvRjlRc0hSamlPQUMxRDlaZTBJbG9h')
     request_token = requests.post(url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
     if request_token.status_code < 400:
         return auth_type + ' ' + request_token.json()['access_token'] if auth_type else request_token.json()
@@ -80,95 +79,7 @@ def merge_entrys2(entrys,data):
             data.append(entry)
     print('finaly')
     return data
-"""
-def merge_entrys(entrys,data):
-    merge_result = [] 
-    merge_data = {}
 
-    for row in entrys:
-        merge_row = {}
-        if row.keys() != data[0].keys():
-            for key in row:
-                if not key in data[0].keys():
-                    merge_data[key] = row[key]
-                else:
-                    merge_row[key] = data[0][key]
-        for key in merge_row:
-            row[key] = merge_row[key]
-        print(row)
-        data.append(row)
-
-    for val in data:
-        for key in merge_data:
-            val[key] = merge_data[key]
-
-            
-    for val in [val for val in data]:
-        aux = val
-        for row in entrys:
-            #entrys.remove(row)
-            #data.remove(val)
-            if row.keys() != val.keys():
-                
-                #print('aux',aux)
-                #print('val',val)
-                for key in row:
-                    if not key in val:
-                        #print(val,key)
-                        val[key] = row[key]
-                #val.update(row)
-                for key in val:
-                    if not key in row:
-                        row[key] = val[key]
-            #if row.keys() == val.keys():
-            #data.append(row)    
-            #data.append(aux)
-            data.append(row)
-        data.append(aux)
-        break
-                
-            #merge_result.append(row)
-         
-
-
-    #for row in entrys:
-    #    print('ASDASDASD')
-    #    data.append(row)
-
-    return data
-    
-
-def merge_entrys3(entrys,data):
-    for val in data:
-        print('mmmmmmmmmmh')
-        for entry in entrys:
-            for key in val:
-                if not key in entry:
-                    entry[key] = val[key]
-            for key in entry:
-                if not key in val:
-                    val[key] = entry[key]
-    
-            data.append(entry)
-
-    return data 
-"""
-"""
-def merge_entrys(entrys,data):
-    merge_result = [] 
-    for val in [val for val in data]:
-
-        for row in [row for row in entrys if row.keys() == val.keys()]:
-            merge_result.append(row)
-            entrys.remove(row)
-
-        for row in entrys:
-            row.update(val)
-            merge_result.append(row)
-            entrys.remove(row)
-
-    return merge_result
-"""
 def merge_entrys(entrys,data):
 
     for row in [row for row in entrys if row.keys() == data[0].keys()]:
@@ -232,26 +143,3 @@ def merge_filter(data,args):
             entrys = aux
     
     return entrys
-
-
-# gramatica ... clientCount, location and macAddress
-# 
-"""
-args = ["clientCount","location","macAddress"]
-url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='
-#url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/RogueAccessPointAlarm?maxResult=1000&firstResult='
-#url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/RogueAccessPointAlarm?id='
-#url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/Building'
-token_url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
-secret = 'BrszH8oF9QsHRjiOAC1D9Ze0Iloa'
-auth_type = 'Bearer'
-content_type = 'application/x-www-form-urlencoded'
-key = 'j_mGndxK2WLKEUKbGrkX7n1uxAEa'
-# get_token(url,key,secret,content_type=None,auth_type=None)
-token = get_token(token_url,key,secret,content_type,auth_type)
-for i in range(8):
-    r = make_request_token(url+(str(i*10)),token)
-    print(r)
-    print(r.json())
-    send_influx(r.json(),args)
-"""
