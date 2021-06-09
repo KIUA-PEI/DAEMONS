@@ -84,34 +84,35 @@ def make_request(period):
     print(x)
     """ 
     for val in Query.get_basic_period(period):
-        print('basic')
-        print(val[0])
-        print('\n')
+        #print('basic')
+        #print(val[0])
+        #print('\n')
         request_basic(val[0])
         
     
     for val in Query.get_key_period(period): 
-        print('key')
-        print(val)
-        print('\n')
+        #print('key')
+        #print(val)
+        #print('\n')
         request_key(val)
         
         
     for val in Query.get_http_period(period):
-        print('http')
-        print(val)
-        print('\n')
+        #print('http')
+        #print(val)
+        #print('\n')
         request_http(val)
     
       
     for val in Query.get_token_period(period):
-        print('token')
-        print(val)
-        print('\n')
+        #print('token')
+        #print(val)
+        #print('\n')
         request_token(val)
      
     
 def main():
+    """
     print('STARTING ...')
     print('_____________________________________________________')
     print('Basic\n')
@@ -131,6 +132,7 @@ def main():
     print('\n')
     print('_____________________________________________________')
     print('\n')
+    """
     # start scheduler
     scheduler = BackgroundScheduler()
     # configure scheduler
@@ -145,7 +147,7 @@ def main():
         #influx = InfluxDBClient(host='127.0.0.1', port=8086, username="daemon", password="daemon_1234")
         # add jobs
     if True:    
-        influx = None
+
         scheduler.add_job(make_request, trigger="interval", args=[5], minutes=5, id="5minjob_basic", next_run_time=datetime.now())
         
         scheduler.add_job(make_request, trigger="interval", args=[15], minutes=15, id="15minjob_basic", next_run_time=datetime.now())
@@ -167,6 +169,7 @@ def main():
             scheduler.remove_job('5minjob_basic')
             scheduler.remove_job('15minjob_basic')
             scheduler.remove_job('30minjob_basic')
+            scheduler.remove_job('60minjob_basic')
             scheduler.remove_job('dailyjob_basic')
             scheduler.shutdown()
             scheduler.shutdown()

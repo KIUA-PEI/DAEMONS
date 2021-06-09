@@ -16,10 +16,6 @@ def format_influx(metric_id,data):
         else:
             add_entry['time'] = str(get_timestamp())
         
-
-        #fields = []
-        #for key in entry:
-        #    fields.append({key:entry[key]})
         if entry:
             add_entry['fields'] = entry
             
@@ -32,12 +28,10 @@ def request_basic(url):
     request = requests.get(url,timeout=25)
     if request.status_code == 200: 
         for val in Query.get_basic_args(url):
-            
             args = [arg.strip() for arg in val[0].split(',')] if val[0] else 1
+            print(url,args)
             try:
                 db_entrys = format_influx(val[1],merge_filter(request.json(),args))
-                for entry in db_entrys:
-                    print(entry['fields'],entry['time'])
                 if db_entrys:
                     try:
                         influx.write_points(db_entrys, database="Test")
@@ -72,8 +66,8 @@ def request_key(val):
     
     request = requests.get(val.url,headers={'Authorization': val.key},timeout=25)
     if request.status_code < 400:
-            args = [arg.strip() for arg in val.args.split(',')] if val.args else request.json().keys()
-            
+            args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
+            print(val.url,args)
             try:
                 db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
                 if db_entrys:
@@ -107,25 +101,20 @@ def request_http(val):
     print('STARTING HTTP\n')
     request = requests.get(val.url,headers={"userName": val.username , "password": val.key},timeout=25)
     if request.status_code < 400:    
-        
-        if val.args:
-            args = [arg.strip() for arg in val.args.split(',')]
-            print('http',val.url,args)
-            try:
-                db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
-                # enviar para a influx
-                if db_entrys:
-                    try:
-                        influx.write_points(db_entrys, database="Test")
-                    except:
-                        print('influx failed')
-                else:
-                    print('BAD FORMAT')
-            except:
-                Query.pause_http(val.metric_id)
-                print("FILTER FAILED")     
-        else:
-            print('SEND TO INFLUX')   
+        args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
+        print(val.url,args)
+        try:
+            db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
+            if db_entrys:
+                try:
+                    influx.write_points(db_entrys, database="Test")
+                except:
+                    print('influx failed')
+            else:
+                print('BAD FORMAT')
+        except:
+            Query.pause_http(val.metric_id)
+            print("FILTER FAILED")       
     
     elif request.status_code == 401:
         Query.pause_http(val.metric_id)
@@ -161,13 +150,11 @@ def request_token(val):
     while check < 4:
         request = requests.get(val.url,headers={'Authorization': tokens[val.url]},timeout=25)
         if request.status_code<=200:
-            
             args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
+            print(val.url,args)
             try:
                 db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
                 if db_entrys:
-                    for entry in db_entrys:
-                        print(entry['fields'],entry['time'])
                     try:
                         influx.write_points(db_entrys, database="Test")
                     except:
