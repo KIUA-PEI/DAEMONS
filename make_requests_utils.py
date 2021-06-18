@@ -4,21 +4,23 @@ from make_requests import *
 
 tokens = {}
 
-# se calhar caso não tenha args usar merge_filter(vals,vals.keys) -> tudo
 def format_influx(metric_id,data):
     result = []
     for entry in [entry for entry in data if entry]:
         add_entry = {"measurement":metric_id,"tags":{'id':metric_id}}
-        #print(entry)
+        
         if 'Timestamp' in entry:
             add_entry['time'] = entry['Timestamp']
             del entry['Timestamp']
         else:
             add_entry['time'] = str(get_timestamp())
         
+        for key in [key for key in entry if isinstance(entry[key],str)]:
+            add_entry['tags'][key] = entry[key]
+            del entry[key]
+
         if entry:
             add_entry['fields'] = entry
-            
             result.append(add_entry)
     
     return result 
@@ -70,6 +72,7 @@ def request_key(val):
             print(val.url,args)
             try:
                 db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
+                
                 if db_entrys:
                     try:
                         influx.write_points(db_entrys, database="Metrics")
@@ -105,6 +108,7 @@ def request_http(val):
         print(val.url,args)
         try:
             db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
+           
             if db_entrys:
                 try:
                     influx.write_points(db_entrys, database="Metrics")
@@ -154,6 +158,7 @@ def request_token(val):
             print(val.url,args)
             try:
                 db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
+                
                 if db_entrys:
                     try:
                         influx.write_points(db_entrys, database="Metrics")
