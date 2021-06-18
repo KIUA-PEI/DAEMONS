@@ -34,7 +34,7 @@ def request_basic(url):
                 db_entrys = format_influx(val[1],merge_filter(request.json(),args))
                 if db_entrys:
                     try:
-                        influx.write_points(db_entrys, database="Test")
+                        influx.write_points(db_entrys, database="Metrics")
                     except:
                         print('influx failed')
                 else:
@@ -45,20 +45,20 @@ def request_basic(url):
     
     elif request.status_code == 401:
         for val in Query.get_basic_args(url):
-            Query.pause_basic_url(val[1])
+            Query.pause_basic(val[1])
             print('Authentication Error')
     elif request.status_code == 403:
         for val in Query.get_basic_args(url):
-            Query.pause_basic_url(val[1])
+            Query.pause_basic(val[1])
             print("URL FORBIDEN OPERATION")
     elif request.status_code == 404:
         for val in Query.get_basic_args(url):
-            Query.pause_basic_url(val[1])
+            Query.pause_basic(val[1])
             print('URL NOT FOUND')
     else:
         for val in Query.get_basic_args(url):
             print('bad request')
-            Query.pause_basic_url(val[1])
+            Query.pause_basic(val[1])
     return False
 
 def request_key(val):       
@@ -72,7 +72,7 @@ def request_key(val):
                 db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
                 if db_entrys:
                     try:
-                        influx.write_points(db_entrys, database="Test")
+                        influx.write_points(db_entrys, database="Metrics")
                     except:
                         print('influx failed')
                 else:
@@ -107,7 +107,7 @@ def request_http(val):
             db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
             if db_entrys:
                 try:
-                    influx.write_points(db_entrys, database="Test")
+                    influx.write_points(db_entrys, database="Metrics")
                 except:
                     print('influx failed')
             else:
@@ -156,7 +156,7 @@ def request_token(val):
                 db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
                 if db_entrys:
                     try:
-                        influx.write_points(db_entrys, database="Test")
+                        influx.write_points(db_entrys, database="Metrics")
                     except:
                         print('influx failed')
                 else:

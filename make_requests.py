@@ -84,35 +84,35 @@ def make_request(period):
     print(x)
     """ 
     for val in Query.get_basic_period(period):
-        #print('basic')
-        #print(val[0])
-        #print('\n')
+        print('basic')
+        print(val[0])
+        print('\n')
         request_basic(val[0])
         
     
     for val in Query.get_key_period(period): 
-        #print('key')
-        #print(val)
-        #print('\n')
+        print('key')
+        print(val)
+        print('\n')
         request_key(val)
         
         
     for val in Query.get_http_period(period):
-        #print('http')
-        #print(val)
-        #print('\n')
+        print('http')
+        print(val)
+        print('\n')
         request_http(val)
     
       
     for val in Query.get_token_period(period):
-        #print('token')
-        #print(val)
-        #print('\n')
+        print('token')
+        print(val)
+        print('\n')
         request_token(val)
      
     
 def main():
-    """
+   
     print('STARTING ...')
     print('_____________________________________________________')
     print('Basic\n')
@@ -132,7 +132,7 @@ def main():
     print('\n')
     print('_____________________________________________________')
     print('\n')
-    """
+    
     # start scheduler
     scheduler = BackgroundScheduler()
     # configure scheduler

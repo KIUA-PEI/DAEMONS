@@ -7,15 +7,21 @@ import json
 import jwt
 import datetime
 from functools import wraps
-import os
+#import os
+from config import *
 
+#print(Config.SECRET_KEY)
+#print(Config.SQLALCHEMY_DATABASE_URI)
 
 app = Flask(__name__)
 #print(os.environ.get('DATABASE_URL') or \
 #        'sqlite:///' + os.path.join(basedir, 'app.db'))
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'daemons_db.db')
+#basedir = os.path.abspath(os.path.dirname(__file__))
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or \
+#        'sqlite:///' + os.path.join(basedir, 'daemons_db.db')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = Config.SQLALCHEMY_DATABASE_URI
+app.config['SECRET_KEY'] = Config.SECRET_KEY
 
 db = SQLAlchemy(app)
 api = Api(app)
@@ -206,7 +212,7 @@ print('\n')
 print('\n')
 """
 #   AUTHENTICATION KEY
-app.config['SECRET_KEY'] = 'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'
+#app.config['SECRET_KEY'] = 'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'
 @app.route('/login', methods=['GET'])
 def login():
     auth = request.authorization
@@ -576,6 +582,9 @@ def api_period_token(period):
     print(Query.get_token_period(period))
     return "PRINTED DAEMONS FREQ 5",201
 
+@app.route('/',methods=['GET'])
+def home():
+	return 'DAEMON_API'
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
