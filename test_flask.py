@@ -172,6 +172,55 @@ if r.status_code < 400:
     print(r)
 print()  
 
+r = requests.get('http://127.0.0.1:5000/Daemon/Remove/Token',{"id":5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()  
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Remove/Token',{"id":6},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()  
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Remove/Token',{"id":7},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()  
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Remove/Token',{"id":8},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()  
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Remove/Token',{"id":9},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()  
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Remove/Token',{"id":10},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print() 
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Remove/Token',{"id":11},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print() 
+
 print("_________________ ADD WIFI TOKEN DAEMON REQUEST __________________")
 r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"id":1,"url":'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult=',"args":"clientCount, location, macAddress","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
 print(r.status_code)
@@ -195,6 +244,55 @@ if r.status_code < 400:
 print()
 
 r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"id":4,"url":'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult=',"args":"clientCount_2_4GHz, upTime, location, macAddress","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"id":5,"url":'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult=',"args":"clientCount_2_4GHz, upTime, location, macAddress","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"id":6,"url":'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult=',"args":"clientCount_2_4GHz, upTime, location, macAddress","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"id":7,"url":'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult=',"args":"clientCount_2_4GHz, upTime, location, macAddress","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"id":8,"url":'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult=',"args":"clientCount_2_4GHz, upTime, location, macAddress","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"id":9,"url":'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult=',"args":"clientCount_2_4GHz, upTime, location, macAddress","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"id":10,"url":'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult=',"args":"clientCount_2_4GHz, upTime, location, macAddress","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()
+
+r = requests.get('http://127.0.0.1:5000/Daemon/Add/Token',{"id":11,"url":'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult=',"args":"clientCount_2_4GHz, upTime, location, macAddress","token_url":'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid',"secret":'BrszH8oF9QsHRjiOAC1D9Ze0Iloa',"auth_type":'Bearer',"content_type":'application/x-www-form-urlencoded',"key":'j_mGndxK2WLKEUKbGrkX7n1uxAEa','period':5},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
 print(r.status_code)
 print(r.text)
 if r.status_code < 400:

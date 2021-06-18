@@ -40,7 +40,7 @@ def request_basic(url):
                     except:
                         print('influx failed')
                 else:
-                    print('BAD FORMAT')
+                    print('BAD FORMAT BASIC')
             except:
                 Query.pause_basic(val[1])
                 print("FILTER FAILED")         
@@ -137,8 +137,9 @@ def request_http(val):
         
 def request_token(val):
     print('STARTING TOKEN\n')
-    check = 0
+    print('requesting',val.metric_id)
     
+    check = 0
     if not val.url in tokens:
         tokens[val.url] = None
         while not tokens[val.url]:
