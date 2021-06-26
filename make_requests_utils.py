@@ -1,6 +1,7 @@
 from api_daemon import Query
 from utils import *
 from make_requests import *
+from datetime import datetime as dt
 
 tokens = {}
 
@@ -10,7 +11,7 @@ def format_influx(metric_id,data):
         add_entry = {"measurement":metric_id,"tags":{'id':metric_id}}
         
         if 'Timestamp' in entry:
-            add_entry['time'] = entry['Timestamp']
+            add_entry['time'] = dt.fromtimestamp(entry['Timestamp']).isoformat()
             del entry['Timestamp']
         else:
             add_entry['time'] = str(get_timestamp())
@@ -23,7 +24,6 @@ def format_influx(metric_id,data):
             add_entry['fields'] = entry
             result.append(add_entry)
 
-        print(add_entry)
     return result 
 
 def request_basic(url):
