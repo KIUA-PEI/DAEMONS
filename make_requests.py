@@ -117,7 +117,7 @@ def add_new_token(period,request_id):
     scheduler.add_job(start_requests_token, trigger="interval", args=[period,request_id], minutes=period, id="5minjob_token"+str(request_id), next_run_time=datetime.now())
 
 def main():
-    """
+    
     print('STARTING ...')
     print('_____________________________________________________')
     print('Basic\n')
@@ -137,7 +137,7 @@ def main():
     print('\n')
     print('_____________________________________________________')
     print('\n')
-    """
+    
     
     job_defaults = {
         'coalesce': False,
