@@ -41,6 +41,7 @@ def request_basic(url):
                         print('influx failed')
                 else:
                     print('BAD FORMAT BASIC')
+                    Query.pause_basic(val[1])
             except:
                 Query.pause_basic(val[1])
                 print("FILTER FAILED")         
@@ -80,6 +81,7 @@ def request_key(val):
                         print('influx failed')
                 else:
                     print('BAD FORMAT')
+                    Query.pause_key(val.metric_id)
             except:
                 Query.pause_key(val.metric_id)
                 print("FILTER FAILED")
@@ -116,6 +118,7 @@ def request_http(val):
                     print('influx failed')
             else:
                 print('BAD FORMAT')
+                Query.pause_http(val.metric_id)
         except:
             Query.pause_http(val.metric_id)
             print("FILTER FAILED")       
@@ -167,6 +170,7 @@ def request_token(val):
                         print('influx failed')
                 else:
                     print('BAD FORMAT')
+                    Query.pause_token(val.metric_id)
             except:
                 Query.pause_token(val.metric_id)
                 print("FILTER FAILED") 
