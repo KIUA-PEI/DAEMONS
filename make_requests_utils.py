@@ -22,7 +22,8 @@ def format_influx(metric_id,data):
         if entry:
             add_entry['fields'] = entry
             result.append(add_entry)
-    
+
+        print(add_entry)
     return result 
 
 def request_basic(url):
