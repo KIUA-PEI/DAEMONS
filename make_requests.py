@@ -47,6 +47,9 @@ def start_requests_basic(period,request_id):
     
     for thread in threads:
         thread.join()
+        
+    if count == 0:
+        remove_basic(period,request_id)
 
 def start_requests_key(period,request_id):
     threads = []
@@ -63,6 +66,9 @@ def start_requests_key(period,request_id):
     
     for thread in threads:
         thread.join()
+    
+    if count == 0:
+        remove_key(period,request_id)
 
 def start_requests_http(period,request_id):
     threads = []
@@ -79,6 +85,8 @@ def start_requests_http(period,request_id):
     
     for thread in threads:
         thread.join()
+    if count == 0:
+        remove_http(period,request_id)
 
 def start_requests_token(period,request_id):
     threads = []
@@ -92,9 +100,12 @@ def start_requests_token(period,request_id):
             add_new_token(period,request_id+1)
             break
         count += 1
-
+    
     for thread in threads:
         thread.join()
+        
+    if count == 0:
+        remove_token(period,request_id)
 
 
 def add_new_basic(period,request_id):
