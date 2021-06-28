@@ -213,6 +213,7 @@ print('\n')
 """
 #   AUTHENTICATION KEY
 #app.config['SECRET_KEY'] = 'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'
+"""
 @app.route('/login', methods=['GET'])
 def login():
     auth = request.authorization
@@ -222,6 +223,8 @@ def login():
     
     #return make_response('User NOT Authenticated', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
     return 'User NOT Authenticated',401
+"""
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -241,7 +244,6 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
-daemons = {1:{"name":"recolha de kpis", "metric": '1 hora', "url":"www.current.pt"},2:{"name":"recolha de kpis", "metric": '1 hora', "url":"www.lol.pt"}}
 
 
 # ____________________________ BASIC __________________________________
