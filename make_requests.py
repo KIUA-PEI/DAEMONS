@@ -99,22 +99,42 @@ def start_requests_token(period,request_id):
 
 def add_new_basic(period,request_id):
     basic_scheduelers[str(period)] += 1
-    scheduler.add_job(start_requests_basic, trigger="interval", args=[period,request_id], minutes=period, id="5minjob_basic"+str(request_id), next_run_time=datetime.now())
+    scheduler.add_job(start_requests_basic, trigger="interval", args=[period,request_id], minutes=period, id=str(period)+"minjob_basic"+str(request_id), next_run_time=datetime.now())
    
 
 def add_new_key(period,request_id):
     key_scheduelers[str(period)] += 1
-    scheduler.add_job(start_requests_key, trigger="interval", args=[period,request_id], minutes=period, id="5minjob_key"+str(request_id), next_run_time=datetime.now())
+    scheduler.add_job(start_requests_key, trigger="interval", args=[period,request_id], minutes=period, id=str(period)+"minjob_key"+str(request_id), next_run_time=datetime.now())
     
 
 def add_new_http(period,request_id):
     http_scheduelers[str(period)] += 1
-    scheduler.add_job(start_requests_http, trigger="interval", args=[period,request_id], minutes=period, id="5minjob_http"+str(request_id), next_run_time=datetime.now())
+    scheduler.add_job(start_requests_http, trigger="interval", args=[period,request_id], minutes=period, id=str(period)+"minjob_http"+str(request_id), next_run_time=datetime.now())
   
 
 def add_new_token(period,request_id):
     token_scheduelers[str(period)] += 1
-    scheduler.add_job(start_requests_token, trigger="interval", args=[period,request_id], minutes=period, id="5minjob_token"+str(request_id), next_run_time=datetime.now())
+    scheduler.add_job(start_requests_token, trigger="interval", args=[period,request_id], minutes=period, id=str(period)+"minjob_token"+str(request_id), next_run_time=datetime.now())
+
+
+
+def remove_basic(period,request_id):
+    basic_scheduelers[str(period)] += 1
+    scheduler.remove_job(str(period)+"minjob_basic"+str(request_id))
+   
+def remove_key(period,request_id):
+    key_scheduelers[str(period)] += 1
+    scheduler.remove_job(str(period)+"minjob_key"+str(request_id))
+    
+
+def remove_http(period,request_id):
+    http_scheduelers[str(period)] += 1
+    scheduler.remove_jobremove_job(str(period)+"minjob_http"+str(request_id))
+  
+
+def remove_token(period,request_id):
+    token_scheduelers[str(period)] += 1
+    scheduler.remove_job(str(period)+"minjob_token"+str(request_id))
 
 def main():
     

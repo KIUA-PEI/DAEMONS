@@ -41,8 +41,8 @@ def request_basic(url):
                     except:
                         print('influx failed')
                 else:
-                    print('BAD FORMAT BASIC')
                     Query.pause_basic(val[1])
+                    print('BAD FORMAT BASIC')
             except:
                 Query.pause_basic(val[1])
                 print("FILTER FAILED")         
@@ -59,10 +59,13 @@ def request_basic(url):
         for val in Query.get_basic_args(url):
             Query.pause_basic(val[1])
             print('URL NOT FOUND')
-    else:
+    elif request.status_code < 500:
         for val in Query.get_basic_args(url):
-            print('bad request')
             Query.pause_basic(val[1])
+            print('bad request')
+    else:
+        print('Internal Server Error')
+        
     return False
 
 def request_key(val):       
@@ -87,7 +90,7 @@ def request_key(val):
                 Query.pause_key(val.metric_id)
                 print("FILTER FAILED")
                 return False
-    
+            
     elif request.status_code == 401:
         Query.pause_key(val.metric_id)
         print('Authentication Error')
@@ -97,9 +100,11 @@ def request_key(val):
     elif request.status_code == 404:
         Query.pause_key(val.metric_id)
         print('URL NOT FOUND')
-    else:
+    elif request.status_code < 500:
         print('bad request')
-        Query.pause_key(val.metric_id)
+        Query.pause_token(val.metric_id)
+    else:
+        print('Internal Server Error')
         
     return False
 
@@ -133,9 +138,11 @@ def request_http(val):
     elif request.status_code == 404:
         Query.pause_http(val.metric_id)
         print('URL NOT FOUND')
-    else:
+    elif request.status_code < 500:
         print('bad request')
         Query.pause_http(val.metric_id)
+    else:
+        print('Internal Server Error')
         
     return False
         
@@ -156,41 +163,40 @@ def request_token(val):
     
     check = 0
    
-    while check < 4:
-        request = requests.get(val.url,headers={'Authorization': tokens[val.url]},timeout=25)
-        if request.status_code<=200:
-            args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
-            print(val.url,args)
-            try:
-                db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
+    request = requests.get(val.url,headers={'Authorization': tokens[val.url]},timeout=25)
+    if request.status_code<=200:
+        args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
+        print(val.url,args)
+        try:
+            db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
                 
-                if db_entrys:
-                    try:
-                        influx.write_points(db_entrys, database="Metrics")
-                    except:
-                        print('influx failed')
-                else:
-                    print('BAD FORMAT')
-                    Query.pause_token(val.metric_id)
-            except:
+            if db_entrys:
+                try:
+                    influx.write_points(db_entrys, database="Metrics")
+                except:
+                    print('influx failed')
+            else:
+                print('BAD FORMAT')
                 Query.pause_token(val.metric_id)
-                print("FILTER FAILED") 
-                return False
-            return
+        except:
+            Query.pause_token(val.metric_id)
+            print("FILTER FAILED") 
+            return False
+        return
         
-        elif request.status_code == 401:
-            Query.pause_token(val.metric_id)
-            print('Authentication Error')
-        elif request.status_code == 403:
-            Query.pause_token(val.metric_id)
-            print("URL FORBIDEN OPERATION")
-        elif request.status_code == 404:
-            Query.pause_token(val.metric_id)
-            print('URL NOT FOUND')
-        elif request.status_code < 500:
-            print('bad request')
-            Query.pause_token(val.metric_id)
-        else:
-            check += 1
+    elif request.status_code == 401:
+        Query.pause_token(val.metric_id)
+        print('Authentication Error')
+    elif request.status_code == 403:
+        Query.pause_token(val.metric_id)
+        print("URL FORBIDEN OPERATION")
+    elif request.status_code == 404:
+        Query.pause_token(val.metric_id)
+        print('URL NOT FOUND')
+    elif request.status_code < 500:
+        print('bad request')
+        Query.pause_token(val.metric_id)
+    else:
+        print('Internal Server Error')
         
     return False
