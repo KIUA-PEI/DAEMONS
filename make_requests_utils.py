@@ -28,7 +28,7 @@ def format_influx(metric_id,data):
 
 def request_basic(url):
     print('STARTING BASIC\n')
-    request = requests.get(url,timeout=25)
+    request = requests.get(url,timeout=40)
     if request.status_code == 200: 
         for val in Query.get_basic_args(url):
             args = [arg.strip() for arg in val[0].split(',')] if val[0] else 1
@@ -71,7 +71,7 @@ def request_basic(url):
 def request_key(val):       
     print('STARTING KEY\n')
     
-    request = requests.get(val.url,headers={'Authorization': val.key},timeout=25)
+    request = requests.get(val.url,headers={'Authorization': val.key},timeout=40)
     if request.status_code < 400:
             args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
             print(val.url,args)
@@ -110,7 +110,8 @@ def request_key(val):
 
 def request_http(val):  
     print('STARTING HTTP\n')
-    request = requests.get(val.url,headers={"userName": val.username , "password": val.key},timeout=25)
+    
+    request = requests.get(val.url,headers={"userName": val.username , "password": val.key},timeout=40)
     if request.status_code < 400:    
         args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
         print(val.url,args)
@@ -148,7 +149,6 @@ def request_http(val):
         
 def request_token(val):
     print('STARTING TOKEN\n')
-    print('requesting',val.metric_id)
     
     check = 0
     if not val.url in tokens:
@@ -163,7 +163,7 @@ def request_token(val):
     
     check = 0
    
-    request = requests.get(val.url,headers={'Authorization': tokens[val.url]},timeout=25)
+    request = requests.get(val.url,headers={'Authorization': tokens[val.url]},timeout=40)
     if request.status_code<=200:
         args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
         print(val.url,args)
