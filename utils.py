@@ -170,19 +170,31 @@ def merge_entrys(entrys,data):
     return merge_result
 """
 def merge_entrys(entrys,data):
-
+    # vai adicionar o elemento de uma lista com as mesmas keys
     for row in [row for row in entrys if row.keys() == data[0].keys()]:
         data.append(row)
         entrys.remove(row)
         
+    # vai ver as keys que não estão na data    
+    # como supostamente as keys na data são iguais para todos os membros só é preciso ver o primeiro
     merge_data = {}
-    for key in data[0]:
+    for key in [key for key in data[0] if not key in entrys[0]]:
         merge_data[key] = data[0][key]
     
+    # adicionar as keys ás novas entradas
     for entry in entrys:
         entry.update(merge_data)
         data.append(entry)
-    
+        
+    # é preciso limpar os elementos de data ... 
+    # caso as keys sejam diferentes pode adicionar as keys de data a entrys 
+    # mas algumas entradas de data ficam sem as keys de entrys
+    # é preciso remover esses casos ...
+    if entrys:
+        for entry in data:
+            if len(entry.keys()) < len(entrys[0].keys()):
+                data.remove(entry)
+        
     return data
 
 def merge_fields(field,data):
@@ -200,14 +212,15 @@ def merge_filter(data,args):
             
             if isinstance(data[field],dict):
                 if entrys:
-                    entrys+=merge_entrys(merge_filter(data[field],args),entrys)
+                    entrys=merge_entrys(merge_filter(data[field],args),entrys)
                 else:
                     entrys=merge_entrys(merge_filter(data[field],args),entrys)
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
                 for val in data[field]:
-                    aux += merge_entrys((merge_filter(val,args)),entrys) if entrys else merge_filter(val,args)
-                entrys = aux
+                    aux += merge_filter(val,args)
+                entrys = merge_entrys(aux,entrys) if entrys else aux
+                
             elif args == 1:
                 if entrys:
                     entrys=merge_fields([{field:data[field]}],entrys)
@@ -221,15 +234,15 @@ def merge_filter(data,args):
         
         elif isinstance(field,dict):
             if entrys:
-                entrys = merge_entrys((merge_filter(field,args)),entrys) if entrys else merge_filter(field,args)
+                entrys = merge_entrys((merge_filter(field,args)),entrys)
             else:
                 entrys = merge_filter(field,args)
         
         elif isinstance(field,list):
             aux = []
             for val in field:
-                aux += merge_entrys((merge_filter(val,args)),entrys) if entrys else merge_filter(val,args)
-            entrys = aux
+                aux +=merge_filter(val,args)
+            entrys = merge_entrys(aux,entrys)
     
     return entrys
 

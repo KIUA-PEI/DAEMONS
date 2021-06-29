@@ -5,6 +5,7 @@ from datetime import datetime as dt
 
 tokens = {}
 
+
 def format_influx(metric_id,data):
     result = []
     for entry in [entry for entry in data if entry]:
@@ -37,7 +38,7 @@ def request_basic(url):
                 db_entrys = format_influx(val[1],merge_filter(request.json(),args))
                 if db_entrys:
                     try:
-                        influx.write_points(db_entrys, database="Metrics")
+                        influx.write_points(db_entrys, database="Metrics") 
                     except:
                         print('influx failed')
                 else:
