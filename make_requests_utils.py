@@ -90,7 +90,6 @@ def request_key(val):
             except:
                 Query.pause_key(val.metric_id)
                 print("FILTER FAILED")
-                return False
             
     elif request.status_code == 401:
         Query.pause_key(val.metric_id)
@@ -151,19 +150,31 @@ def request_http(val):
 def request_token(val):
     print('STARTING TOKEN\n')
     
-    check = 0
-    if not val.url in tokens:
-        tokens[val.url] = None
-        while not tokens[val.url]:
-            tokens[val.url] = get_token(val.token_url,val.key,val.secret,val.content_type,val.auth_type)
-            if check >= 4:
-                print('token request failed')
-                Query.pause_token(val.metric_id)
-                return False
-            check += 1
+    msg = encode_b64(val.key+':'+val.ecret)
+    request = requests.post(val.url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
     
-    check = 0
-   
+    if request.status_code<300:
+        tokens[val.url] = val.auth_type + ' ' + request.json()['access_token']
+    elif request.status_code == 401:
+        Query.pause_token(val.metric_id)
+        print('Token Authentication Error')
+        return 
+    elif request.status_code == 403:
+        Query.pause_token(val.metric_id)
+        print("Token URL FORBIDEN OPERATION")
+        return
+    elif request.status_code == 404:
+        Query.pause_token(val.metric_id)
+        print('Token URL NOT FOUND')
+        return
+    elif request.status_code < 500:
+        print('Token Bad Request')
+        Query.pause_token(val.metric_id)
+        return
+    else:
+        print('Token Internal Server Error')
+        return
+    
     request = requests.get(val.url,headers={'Authorization': tokens[val.url]},timeout=40)
     if request.status_code<=200:
         args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
@@ -182,9 +193,6 @@ def request_token(val):
         except:
             Query.pause_token(val.metric_id)
             print("FILTER FAILED") 
-            return False
-        return
-        
     elif request.status_code == 401:
         Query.pause_token(val.metric_id)
         print('Authentication Error')

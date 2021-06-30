@@ -36,7 +36,7 @@ def get_token(url,key,secret,content_type=None,auth_type=None):
     request_token = requests.post(url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
     if request_token.status_code < 400:
         return auth_type + ' ' + request_token.json()['access_token'] if auth_type else request_token.json()
-    return False
+    return display_error(request_token.status_code)
     
 def send_influx():
     pass
