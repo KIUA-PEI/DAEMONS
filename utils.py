@@ -208,8 +208,9 @@ def merge_fields(field,data):
 def merge_filter(data,args):
     entrys = []
     for field in [field for field in data]:
-        if isinstance(field,str):          
-            
+        
+        if isinstance(field,str):   
+                      
             if isinstance(data[field],dict):
                 if entrys:
                     entrys=merge_entrys(merge_filter(data[field],args),entrys)

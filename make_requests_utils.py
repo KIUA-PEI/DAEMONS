@@ -78,7 +78,6 @@ def request_key(val):
             print(val.url,args)
             try:
                 db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
-                
                 if db_entrys:
                     try:
                         influx.write_points(db_entrys, database="Metrics")
@@ -117,7 +116,9 @@ def request_http(val):
         print(val.url,args)
         try:
             db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
-           
+            print('entrys')
+            print(db_entrys)
+            print('\n')
             if db_entrys:
                 try:
                     influx.write_points(db_entrys, database="Metrics")
@@ -149,13 +150,12 @@ def request_http(val):
         
 def request_token(val):
     print('STARTING TOKEN\n')
-    
     msg = encode_b64(val.key+':'+val.secret)
+    
     if val.metric_id in tokens:
         token = tokens[val.metric_id]
-    
-    elif val.period<60:
-        request = requests.post(val.url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
+    else:
+        request = requests.post(val.token_url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
         if request.status_code<300:
             token = val.auth_type + ' ' + request.json()['access_token']
             tokens[val.metric_id] = token
@@ -178,17 +178,14 @@ def request_token(val):
         else:
             print('Token Internal Server Error')
             return
-    
-    else:
-        request = requests.post(val.url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
-        token = val.auth_type + ' ' + request.json()['access_token']
-        
-    request = requests.get(val.url,headers={'Authorization': token},timeout=40)
-    if request.status_code == 403:
-        request = requests.post(val.url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
-        token = val.auth_type + ' ' + request.json()['access_token']
         if val.period<60:
             tokens[val.metric_id] = token
+        
+    request = requests.get(val.url,headers={'Authorization': token},timeout=40)
+    if request.status_code == 401 and val.period<60:
+        request = requests.post(val.token_url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        token = val.auth_type + ' ' + request.json()['access_token']
+        tokens[val.metric_id] = token
         request = requests.get(val.url,headers={'Authorization': token},timeout=40)
     
     if request.status_code<=200:
