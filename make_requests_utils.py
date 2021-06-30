@@ -38,7 +38,7 @@ def request_basic(url):
                 db_entrys = format_influx(val[1],merge_filter(request.json(),args))
                 if db_entrys:
                     try:
-                        influx.write_points(db_entrys, database="Metrics") 
+                        influx.write_points(db_entrys, database="Metrics")
                     except:
                         print('influx failed')
                 else:
@@ -150,38 +150,52 @@ def request_http(val):
 def request_token(val):
     print('STARTING TOKEN\n')
     
-    msg = encode_b64(val.key+':'+val.ecret)
-    request = requests.post(val.url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
+    msg = encode_b64(val.key+':'+val.secret)
+    if val.metric_id in tokens:
+        token = tokens[val.metric_id]
     
-    if request.status_code<300:
-        tokens[val.url] = val.auth_type + ' ' + request.json()['access_token']
-    elif request.status_code == 401:
-        Query.pause_token(val.metric_id)
-        print('Token Authentication Error')
-        return 
-    elif request.status_code == 403:
-        Query.pause_token(val.metric_id)
-        print("Token URL FORBIDEN OPERATION")
-        return
-    elif request.status_code == 404:
-        Query.pause_token(val.metric_id)
-        print('Token URL NOT FOUND')
-        return
-    elif request.status_code < 500:
-        print('Token Bad Request')
-        Query.pause_token(val.metric_id)
-        return
+    elif val.period<60:
+        request = requests.post(val.url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        if request.status_code<300:
+            token = val.auth_type + ' ' + request.json()['access_token']
+            tokens[val.metric_id] = token
+        elif request.status_code == 401:
+            Query.pause_token(val.metric_id)
+            print('Token Authentication Error')
+            return 
+        elif request.status_code == 403:
+            Query.pause_token(val.metric_id)
+            print("Token URL FORBIDEN OPERATION")
+            return
+        elif request.status_code == 404:
+            Query.pause_token(val.metric_id)
+            print('Token URL NOT FOUND')
+            return
+        elif request.status_code < 500:
+            print('Token Bad Request')
+            Query.pause_token(val.metric_id)
+            return
+        else:
+            print('Token Internal Server Error')
+            return
+    
     else:
-        print('Token Internal Server Error')
-        return
+        request = requests.post(val.url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        token = val.auth_type + ' ' + request.json()['access_token']
+        
+    request = requests.get(val.url,headers={'Authorization': token},timeout=40)
+    if request.status_code == 403:
+        request = requests.post(val.url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        token = val.auth_type + ' ' + request.json()['access_token']
+        if val.period<60:
+            tokens[val.metric_id] = token
+        request = requests.get(val.url,headers={'Authorization': token},timeout=40)
     
-    request = requests.get(val.url,headers={'Authorization': tokens[val.url]},timeout=40)
     if request.status_code<=200:
         args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
         print(val.url,args)
         try:
             db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
-                
             if db_entrys:
                 try:
                     influx.write_points(db_entrys, database="Metrics")

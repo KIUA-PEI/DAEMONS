@@ -37,24 +37,25 @@ def start_requests_basic(period,request_id):
     threads = []
     count = 0
     for val in Query.get_basic_period(period):
+        count += 1
         if count >= period*(request_id-1) and count < period*request_id:
             threading.Thread(target=request_basic(val[0]))
         elif request_id+1 > basic_scheduelers[str(period)] and count+1 > period*request_id:
             print('new basic added!',request_id+1)
             add_new_basic(period,request_id+1)
             break
-        count += 1
     
     for thread in threads:
         thread.join()
         
-    if count == 0:
+    if count == 0 and request_id>1:
         remove_basic(period,request_id)
 
 def start_requests_key(period,request_id):
     threads = []
     count = 0
     for val in Query.get_key_period(period):
+        count += 1
         if count >= period*(request_id-1) and count < period*request_id:
             print('thread_added',val.metric_id,request_id)
             threading.Thread(target=request_key(val))
@@ -62,18 +63,18 @@ def start_requests_key(period,request_id):
             print('new key added!',request_id+1)
             add_new_key(period,request_id+1)
             break
-        count += 1
     
     for thread in threads:
         thread.join()
     
-    if count == 0:
+    if count == 0 and request_id>1:
         remove_key(period,request_id)
 
 def start_requests_http(period,request_id):
     threads = []
     count = 0
     for val in Query.get_http_period(period):
+        count += 1
         if count >= period*(request_id-1) and count < period*request_id:
             print('thread_added',val.metric_id,request_id)
             threading.Thread(target=request_http(val))
@@ -81,30 +82,29 @@ def start_requests_http(period,request_id):
             print('new http added!',request_id+1)
             add_new_http(period,request_id+1)
             break
-        count += 1
     
     for thread in threads:
         thread.join()
-    if count == 0:
+    if count == 0 and request_id>1:
         remove_http(period,request_id)
 
 def start_requests_token(period,request_id):
     threads = []
     count = 0
     for val in Query.get_token_period(period):
+        count += 1
         if count >= period*(request_id-1) and count < period*request_id:
             print('thread_added',val.metric_id,request_id)
             threading.Thread(target=request_token(val))
         elif request_id+1 > token_scheduelers[str(period)] and count+1 > period*request_id:
             print('new token added!',request_id+1)
             add_new_token(period,request_id+1)
-            break
-        count += 1
+            break    
     
     for thread in threads:
         thread.join()
-        
-    if count == 0:
+    print(count)
+    if count == 0 and request_id>1:
         remove_token(period,request_id)
 
 

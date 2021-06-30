@@ -8,7 +8,7 @@ import jwt
 import datetime
 from functools import wraps
 #import os
-from config import *
+#from config import *
 
 #print(Config.SECRET_KEY)
 #print(Config.SQLALCHEMY_DATABASE_URI)
@@ -20,8 +20,11 @@ app = Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or \
 #        'sqlite:///' + os.path.join(basedir, 'daemons_db.db')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = Config.SQLALCHEMY_DATABASE_URI
-app.config['SECRET_KEY'] = Config.SECRET_KEY
+#app.config['SQLALCHEMY_DATABASE_URI'] = Config.SQLALCHEMY_DATABASE_URI
+#app.config['SECRET_KEY'] = Config.SECRET_KEY
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///daemons_database.db'
+app.config['SECRET_KEY'] = "ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238"
 
 db = SQLAlchemy(app)
 api = Api(app)
