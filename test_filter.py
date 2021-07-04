@@ -13,7 +13,8 @@ def get_token(url,key,secret,content_type=None,auth_type=None):
         return auth_type + ' ' + request_token.json()['access_token'] if auth_type else request_token.json()
     return False
 
-def merge_entrys(entrys,data):
+# não é utilizado
+def merge_all(entrys,data):
     # vai adicionar o elemento de uma lista com as mesmas keys
     for row in [row for row in entrys if row.keys() == data[0].keys()]:
         data.append(row)
@@ -45,54 +46,61 @@ def merge_fields(field,data):
     for row in field:
         for val in data:
             val.update(row)
-    
     return data
     
+def merge_entrys(entrys,fields):
+    for entry in entrys:
+        entry.update(fields)
+    return entrys 
 
 def merge_filter(data,args):
     entrys = []
+    fields = {}
     for field in [field for field in data]:
-        
         if isinstance(field,str):   
                       
             if isinstance(data[field],dict):
                 if entrys:
-                    entrys=merge_entrys(merge_filter(data[field],args),entrys)
+                    entrys+=merge_entrys(merge_filter(data[field],args),fields)
                 else:
-                    entrys=merge_entrys(merge_filter(data[field],args),entrys)
+                    entrys=merge_filter(data[field],args)
+                fields.update(entrys[-1])
+            
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
                 for val in data[field]:
                     aux += merge_filter(val,args)
-                entrys = merge_entrys(aux,entrys) if entrys else aux
+                entrys += merge_entrys(aux,fields)
                 
             elif args == 1:
-                if entrys:
-                    entrys=merge_fields([{field:data[field]}],entrys)
-                else:
-                    entrys.append({field:data[field]})
+                fields[field] = data[field]
             elif field in args:
-                if entrys:
-                    entrys=merge_fields([{field:data[field]}],entrys)
-                else:
-                    entrys.append({field:data[field]})
+                fields[field] = data[field]
         
         elif isinstance(field,dict):
             if entrys:
-                entrys = merge_entrys((merge_filter(field,args)),entrys)
+                entrys += merge_entrys((merge_filter(field,args)),fields)
             else:
                 entrys = merge_filter(field,args)
+            fields.update(entrys[-1])
         
         elif isinstance(field,list):
             aux = []
             for val in field:
                 aux +=merge_filter(val,args)
-            entrys = merge_entrys(aux,entrys)
-    
-    return entrys
+            entrys += merge_entrys(aux,fields) if entrys else aux
+            
+    return entrys if entrys else [fields]
 
 request = requests.get('http://services.web.ua.pt/parques/parques',timeout=40)
-db_entrys = merge_filter(request.json(),1)
+print('\n')
+for entry in request.json():
+    print(entry)
+
+db_entrys = merge_filter(request.json(),["Timestamp","Capacidade","Livre","Ocupado"])
+print('\n')
+print('\n')
+print('\n')
 for entry in db_entrys:
     print(entry)
 
@@ -100,7 +108,8 @@ print('\n')
 print('\n')
 print('\n')
 
-args = ["clientCount","location","macAddress"]
+
+args = ["first","last","clientCount","location","macAddress"]
 url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/AccessPoint?maxResult=1000&firstResult='
 #url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/RogueAccessPointAlarm?maxResult=1000&firstResult='
 #url = 'https://wso2-gw.ua.pt/primecore_primecore-ws/1.0.0/RogueAccessPointAlarm?id='
@@ -117,7 +126,7 @@ token = get_token(token_url,key,secret,content_type,auth_type)
 
 r = requests.get(url,headers={'Authorization': token},timeout=15)
 
-db_entrys = merge_filter(r.json(),1)
+db_entrys = merge_filter(r.json(),args)
 mac_addresses = []
 for entry in db_entrys:
     print(entry)

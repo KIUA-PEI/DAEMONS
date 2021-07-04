@@ -28,6 +28,8 @@ api = Api(app)
    
     
 # ________________________ DB MODELS _______________________________
+
+
 class Basic_url(db.Model):
     metric_id = db.Column(db.Integer(),primary_key=True)
     url = db.Column(db.String(500),nullable=False)
