@@ -64,7 +64,6 @@ def merge_filter(data,args):
                     entrys+=merge_entrys(merge_filter(data[field],args),fields)
                 else:
                     entrys=merge_filter(data[field],args)
-                fields.update(entrys[-1])
             
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
@@ -82,7 +81,6 @@ def merge_filter(data,args):
                 entrys += merge_entrys((merge_filter(field,args)),fields)
             else:
                 entrys = merge_filter(field,args)
-            fields.update(entrys[-1])
         
         elif isinstance(field,list):
             aux = []
@@ -92,12 +90,29 @@ def merge_filter(data,args):
             
     return entrys if entrys else [fields]
 
+
+request = requests.get('https://api.openweathermap.org/data/2.5/weather?q=Lisbon&&appid=669197e669ade29d8b0abb35456e82db',timeout=40)
+print(request.json())
+print('\n')
+
+db_entrys = merge_filter(request.json(),["temp"])
+print('\n')
+print('\n')
+print('_____________________')
+for entry in db_entrys:
+    print(entry)
+print('_____________________')
+print('\n')
+print('\n')
+print('\n')
+
+
 request = requests.get('http://services.web.ua.pt/parques/parques',timeout=40)
 print('\n')
 for entry in request.json():
     print(entry)
 
-db_entrys = merge_filter(request.json(),["Timestamp","Capacidade","Livre","Ocupado"])
+db_entrys = merge_filter(request.json(),["Timestamp","Capacidade","Livre","Ocupado","Nome"])
 print('\n')
 print('\n')
 print('\n')

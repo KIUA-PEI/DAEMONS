@@ -222,7 +222,6 @@ def merge_filter(data,args):
                     entrys+=merge_entrys(merge_filter(data[field],args),fields)
                 else:
                     entrys=merge_filter(data[field],args)
-                fields.update(entrys[-1])
             
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
@@ -240,7 +239,6 @@ def merge_filter(data,args):
                 entrys += merge_entrys((merge_filter(field,args)),fields)
             else:
                 entrys = merge_filter(field,args)
-            fields.update(entrys[-1])
         
         elif isinstance(field,list):
             aux = []
