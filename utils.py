@@ -211,18 +211,28 @@ def merge_entrys(entrys,fields):
         entry.update(fields)
     return entrys 
 
+def merge_fields(field,data):
+    for row in field:
+        for val in data:
+            val.update(row)
+    return data
+    
+def merge_entrys(entrys,fields):
+    for entry in entrys:
+        entry.update(fields)
+    return entrys 
+
 def merge_filter(data,args):
     entrys = []
     fields = {}
     for field in [field for field in data]:
-        if isinstance(field,str):   
-                      
+        if isinstance(field,str):       
             if isinstance(data[field],dict):
-                if entrys:
-                    entrys+=merge_entrys(merge_filter(data[field],args),fields)
-                else:
-                    entrys=merge_filter(data[field],args)
-            
+                aux = merge_filter(data[field],args)
+                if len(aux) == 1:
+                    fields.update(aux[0])
+                elif aux:
+                    entrys += aux
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
                 for val in data[field]:
@@ -232,21 +242,18 @@ def merge_filter(data,args):
             elif args == 1:
                 fields[field] = data[field]
             elif field in args:
-                fields[field] = data[field]
+                fields[field] = data[field]                    
         
         elif isinstance(field,dict):
-            if entrys:
-                entrys += merge_entrys((merge_filter(field,args)),fields)
-            else:
-                entrys = merge_filter(field,args)
+            entrys += merge_filter(field,args)
         
         elif isinstance(field,list):
             aux = []
             for val in field:
-                aux +=merge_filter(val,args)
-            entrys += merge_entrys(aux,fields) if entrys else aux
-            
-    return entrys if entrys else [fields]
+                aux += merge_filter(val,args)
+            entrys += aux
+               
+    return merge_entrys(entrys,fields)  if entrys else [fields]
 
 
 # gramatica ... clientCount, location and macAddress

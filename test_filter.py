@@ -57,14 +57,16 @@ def merge_filter(data,args):
     entrys = []
     fields = {}
     for field in [field for field in data]:
-        if isinstance(field,str):   
-                      
+        if isinstance(field,str):       
             if isinstance(data[field],dict):
-                if entrys:
-                    entrys+=merge_entrys(merge_filter(data[field],args),fields)
-                else:
-                    entrys=merge_filter(data[field],args)
-            
+                aux = merge_filter(data[field],args)
+                # se len for igual a 1 dá update aos fields e assume que é apenas um objeto
+                # e adiciona aos fields para depois juntar ao resto dos elementos da lista
+                if len(aux) == 1:
+                    fields.update(aux[0])
+                # resultado é uma lista
+                elif aux:
+                    entrys += aux
             elif not isinstance(data[field],str) and isinstance(data[field],list): 
                 aux = []
                 for val in data[field]:
@@ -74,28 +76,26 @@ def merge_filter(data,args):
             elif args == 1:
                 fields[field] = data[field]
             elif field in args:
-                fields[field] = data[field]
+                fields[field] = data[field]                    
         
         elif isinstance(field,dict):
-            if entrys:
-                entrys += merge_entrys((merge_filter(field,args)),fields)
-            else:
-                entrys = merge_filter(field,args)
+            # vai tratar como um obj independente e adicionar à lista
+            entrys += merge_filter(field,args)
         
         elif isinstance(field,list):
             aux = []
             for val in field:
-                aux +=merge_filter(val,args)
-            entrys += merge_entrys(aux,fields) if entrys else aux
-            
-    return entrys if entrys else [fields]
+                aux += merge_filter(val,args)
+            entrys += aux
+               
+    return merge_entrys(entrys,fields)  if entrys else [fields]
 
 
 request = requests.get('https://api.openweathermap.org/data/2.5/weather?q=Lisbon&&appid=669197e669ade29d8b0abb35456e82db',timeout=40)
 print(request.json())
 print('\n')
 
-db_entrys = merge_filter(request.json(),["temp"])
+db_entrys = merge_filter(request.json(),1)
 print('\n')
 print('\n')
 print('_____________________')
@@ -148,5 +148,5 @@ for entry in db_entrys:
     if 'macAddress' in entry:
         mac_addresses.append(entry['macAddress'])
 
-print(len(set(mac_addresses)))
-print(len(mac_addresses))
+print('set',len(set(mac_addresses)))
+print('total',len(mac_addresses))
